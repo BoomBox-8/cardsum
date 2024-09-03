@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render #type: ignore
 from .models import Post
 from django.http import HttpResponse
@@ -40,12 +42,13 @@ def questionGenerate(request):
     #bodyText = request.body.decode('utf-8')
     pass
 
-
+@csrf_exempt
 def login(request):
 
     if request.method == "POST":
-        name = request.POST.get('username')
-        passKey = request.POST.get('password')
+        data = json.loads(request.body)
+        name = data.get('username')
+        passKey = data.get('password')
          
 
         if not User.objects.filter(username=name).exists(): #user doesn't exist
@@ -65,17 +68,23 @@ def login(request):
             return JsonResponse({"accessToken" : str(refresh.access_token), "message" : "Authenticated Successfully"},  status = 200)
      
 
-    return render(request, 'login.html')
+ 
+
+@csrf_exempt
+def registerUser(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        name = data.get('username')
+        passKey = data.get('password')
+
+        user = User.objects.create_user(username = name, password = passKey) #stores a nice hashed pass so I don't have to muck about with SDAs
+        user.save() #should register, have a check to check for existing accounts
+        return JsonResponse({"message" : "Registered Successfully"},  status = 200)
+        #hopefully this saves it over in the DB
 
 
-def register(request):
-    name = request.POST.get('username')
-    passKey = request.POST.get('password')
+    else:
+        return JsonResponse({"error" : "Registraion Failed Due To Unspecified Reasons"},  status = 400)
 
-    user = User.objects.create_user(username = name, password = passKey) #stores a nice hashed pass so I don't have to muck about with SDAs
-    user.save() #should register, have a check to check for existing accounts
-    return JsonResponse({"message" : "Authenticated Successfully"},  status = 200)
-    #hopefully this saves it over in the DB
-    #also, yeah, sorry users, you folks have to login after registration, not particularly fun to fiddle with all this logic
 
     

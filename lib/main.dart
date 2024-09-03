@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 
 import 'homepage.dart';
-import 'flashcardsPage.dart';
 import 'toolPage.dart';
-import 'summarizerPage.dart';
-import 'httpsTest.dart';
 
 class PreferenceUtils {
   static SharedPreferences? _prefsInstance;
@@ -25,13 +23,15 @@ class PreferenceUtils {
   }
 
   static String getString(String key, [String? defValue]) {
-    return _instance.getString(key) ?? defValue ?? "";
+    return _instance.getString(key) ?? defValue ?? ""; //?? is an unholy op
   }
 
   static Future<bool> setString(String key, String value) async {
     return _instance.setString(key, value);
   }
 }
+//this little fella makes sure JWT tokens are safely tucked away! local storage too!
+
 
 void main() async
 {
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: toolPage(),
+      home: LoginForm(),
 
       theme: ThemeData(
         textTheme: const TextTheme(
@@ -90,30 +90,159 @@ class _LoginFormState extends State<LoginForm> {
   final _passwordController = TextEditingController();
   String _errorMessage = '';
 
-  bool isProvidedDetailsRight(String username, String password) {
-    // Simulated backend check
-    return username == 'user' && password == 'password1234';
-  }
 
-  void _login() {
-    if (_formKey.currentState?.validate() ?? false) {
-      if (isProvidedDetailsRight(
-          _usernameController.text, _passwordController.text)) {
-        setState(() {
-          _errorMessage = 'Login successful!';
 
-          //move to next page here
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
-        });
-        // Navigate to the next screen or handle successful login
-      } else {
-        setState(() {
-          _errorMessage = 'Invalid username or password.';
-        });
-      }
+  Future<bool> _authenticate(String username, String password) async {
+  const url = 'http://127.0.0.1:8000/login/';
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'username': username,
+        'password': password,
+      }),
+    ); //seriously, the pass needs to be hashed or TLS'd
+
+    if (response.statusCode == 200) 
+    {
+      //authenticate aachu bro
+      final responseData = json.decode(response.body);
+      print('Access Token: ${responseData['accessToken']}');
+      print('Message: ${responseData['message']}');
+      setState(() { _errorMessage = "Login Successful";}
+        );
+      return true;
+
+
+
+    } else if (response.statusCode == 400) 
+    {
+      // el failures
+      final errorData = json.decode(response.body);
+      print('Error: ${errorData['error']}');
+      setState(() { _errorMessage = "Login Failed. Error: ${errorData['error']}";}
+        );
+      return false;
+    } 
+    
+    else 
+    {
+      print('Unexpected status code: ${response.statusCode}');
+      setState(() { _errorMessage = "You are on your own, pal";} //no place for komedi here, need to change this later
+        );
+      return false;
+      
     }
+  } 
+  
+  catch (error) {
+    print('An error occurred: $error');
+    return false;
+  }
+}
+//maybe pipe all this to the login form to be displayed
+
+
+  Future<bool> _registerUser(String username, String password) async {
+  const url = 'http://127.0.0.1:8000/registerUser/';
+
+  try {
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'username': username,
+        'password': password,
+      }),
+    ); //seriously, the pass needs to be hashed or TLS'd
+
+    if (response.statusCode == 200) 
+    {
+      //authenticate aachu bro
+      final responseData = json.decode(response.body);
+      print('Message: ${responseData['message']}');
+
+      setState(() { _errorMessage = "Registration Successful";}
+        );
+      return true;
+
+
+
+    } else if (response.statusCode == 400) 
+    {
+      // el failures
+      final errorData = json.decode(response.body);
+      print('Error: ${errorData['error']}');
+      setState(() { _errorMessage = "Registration Failed. Error: ${errorData['error']}";}
+        );
+      return false;
+    } 
+    
+    else 
+    {
+      print('Unexpected status code: ${response.statusCode}');
+      setState(() { _errorMessage = "You are on your own, pal";} 
+        );
+      return false;
+      
+    }
+  } 
+  
+  catch (error) {
+    print('An error occurred: $error');
+    return false;
+  }
+}
+
+
+
+  void _login() async 
+  {
+      String username = _usernameController.text;
+      String password = _passwordController.text;
+
+      bool loginSuccess = await _authenticate(username, password);
+      if (loginSuccess)
+      {
+
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
+
+      }
+
+
   }
 
+   void _register() async 
+  {
+
+      //need some input sanitation here hmmm
+      String username = _usernameController.text;
+      String password = _passwordController.text;
+
+      bool registerSuccess = await _registerUser(username, password);
+      if (registerSuccess)
+      {
+
+        bool loginSuccess = await _authenticate(username, password);
+        if (loginSuccess)
+        {
+
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
+
+      }
+
+      }
+
+
+
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,6 +276,8 @@ class _LoginFormState extends State<LoginForm> {
                             return null;
                           },
                         ),
+
+
                         const SizedBox(height: 40),
                         RoundedTextFormField(
                           obscureText: true,
@@ -159,15 +290,27 @@ class _LoginFormState extends State<LoginForm> {
                             }
                             return null;
                           },
+
+
                         ),
+                       
+                       
                         const SizedBox(height: 40),
-        
-                        
-                        ElevatedButton(
+                         ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
                           child: const Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'),),
                         ),
+
+                        
+                        const SizedBox(height: 40),
+                         ElevatedButton(
+                          onPressed: _register,
+                          style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
+                          child: const Text('Register', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'),),
+                        ),
+
+
                         const SizedBox(height: 20, width: 60),
                         Text(
                           _errorMessage,

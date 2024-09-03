@@ -5,6 +5,8 @@ import 'dart:convert';
 
 
 class DataFetchingScreen extends StatefulWidget {
+  const DataFetchingScreen({super.key});
+
   @override
   _DataFetchingScreenState createState() => _DataFetchingScreenState();
 }
@@ -34,7 +36,7 @@ class _DataFetchingScreenState extends State<DataFetchingScreen>
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: Text('Data Fetching Example'),
+        title: const Text('Data Fetching Example'),
       ),
       body: Center(
         child: FutureBuilder(
@@ -42,7 +44,7 @@ class _DataFetchingScreenState extends State<DataFetchingScreen>
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) 
             {
-              return CircularProgressIndicator(); // Show a loading indicator while fetching data
+              return const CircularProgressIndicator(); // Show a loading indicator while fetching data
             } 
             
             else if (snapshot.hasError)

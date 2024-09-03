@@ -4,6 +4,8 @@ import 'summarizerPage.dart';
 
 class toolPage extends StatefulWidget
 {
+  const toolPage({super.key});
+
   @override
   State<toolPage> createState() => _toolPageState();
 }
@@ -19,10 +21,10 @@ class _toolPageState extends State<toolPage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = Placeholder();
+        page = const Placeholder();
         break;
       case 1:
-        page = FlashcardScreenContainer();
+        page = const FlashcardScreenContainer();
         break;
       
       case 2:
@@ -46,12 +48,12 @@ class _toolPageState extends State<toolPage> {
                   width: 128, //disgusting magic number
                   decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/placeholder.png"), fit: BoxFit.fill))),
           
-          backgroundColor:  Color.fromARGB(255, 23, 23, 31),
+          backgroundColor:  const Color.fromARGB(255, 23, 23, 31),
           
           destinations: [
-          NavigationRailDestination(icon: Icon(Icons.sticky_note_2), label: Text("View Cards", style: Theme.of(context).textTheme.bodyMedium)),
-          NavigationRailDestination(icon: Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
-          NavigationRailDestination(icon: Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
+          NavigationRailDestination(icon: const Icon(Icons.sticky_note_2), label: Text("View Cards", style: Theme.of(context).textTheme.bodyMedium)),
+          NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
+          NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
 
           ], selectedIndex: selectedIndex, onDestinationSelected: (value) {setState(()
           {
@@ -89,23 +91,23 @@ class FlashcardScreenContainer extends StatelessWidget {
                             child: Text('Delete Flashcard', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255), height: 1.3, fontSize: 20), textAlign: TextAlign.center,),
                           ),
       
-              SizedBox(height: 180),          
+              const SizedBox(height: 180),          
               IconButton.filled(onPressed: () {
                 print("skibidi");
-                } , icon: Icon(Icons.arrow_back_rounded)),
+                } , icon: const Icon(Icons.arrow_back_rounded)),
             ],
           ),
       
-          SizedBox(width: 30),
+          const SizedBox(width: 30),
           Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
       
       
             children: [
-              FlashcardScreen(),
+              const FlashcardScreen(),
       
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
       
               ElevatedButton(
                             onPressed: ()=>print("Placeholder"),
@@ -116,7 +118,7 @@ class FlashcardScreenContainer extends StatelessWidget {
             ],
           ),
         
-        SizedBox(width: 30),
+        const SizedBox(width: 30),
         Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [ElevatedButton(
@@ -126,14 +128,14 @@ class FlashcardScreenContainer extends StatelessWidget {
                             child: Text('Edit Flashcard', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255), height: 1.3, fontSize: 20), textAlign: TextAlign.center,),
                           ),
       
-              SizedBox(height: 180),   
+              const SizedBox(height: 180),   
             IconButton.filled(onPressed: () {
                 print("skibidi");
-                } , icon: Icon(Icons.arrow_forward_rounded)),
+                } , icon: const Icon(Icons.arrow_forward_rounded)),
           ],
         ),
       
-          SizedBox(width: 30),],
+          const SizedBox(width: 30),],
       ),
     );
   }

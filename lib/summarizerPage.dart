@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 
 
 class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -36,8 +38,8 @@ class _ChatScreenState extends State<ChatScreen> {
     if (text.isNotEmpty) {
       _controller.clear();
       setState(() {
-        _messages.add("User: " + text);
-        _messages.add("> " + result);
+        _messages.add("User: $text");
+        _messages.add("> $result");
       });
     }
   }
@@ -46,7 +48,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Color.fromARGB(255,21,21,20),
+    return Scaffold(backgroundColor: const Color.fromARGB(255,21,21,20),
       
       body: Column(
         children: <Widget>[
@@ -80,7 +82,7 @@ class TextBox extends StatelessWidget
         padding: const EdgeInsets.all(8.0),
         child: Container(
           decoration: BoxDecoration(
-            color: Color.fromARGB(255,21,21,20),
+            color: const Color.fromARGB(255,21,21,20),
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(12.0),
           ),
@@ -98,7 +100,7 @@ class TextBox extends StatelessWidget
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 32, top: 16),
-                      child: (index % 2 == 0)  ?  Text("> " + _messages[index] , style: DefaultTextStyle.of(context).style.copyWith(color: Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
+                      child: (index % 2 == 0)  ?  Text("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
                     );
                   },
                 ),
@@ -135,12 +137,12 @@ class UserInputField extends StatelessWidget {
             controller: _controller,
             decoration: InputDecoration(
               filled: true,
-              fillColor: Color.fromARGB(255,21,21,20),
+              fillColor: const Color.fromARGB(255,21,21,20),
               
             
               hintText: 'Enter your message here',
               hintStyle: Theme.of(context).textTheme.labelMedium,
-              border: OutlineInputBorder(borderRadius : const BorderRadius.all(Radius.circular(12.0))),
+              border: const OutlineInputBorder(borderRadius : BorderRadius.all(Radius.circular(12.0))),
             ),
             keyboardType: TextInputType.multiline,
             maxLines: null, // Allows the input field to be scrollable
@@ -149,7 +151,7 @@ class UserInputField extends StatelessWidget {
           ),
         ),
         IconButton(
-          icon: Icon(Icons.send),
+          icon: const Icon(Icons.send),
           onPressed: () => _handleSubmitted(_controller.text),
         ),
       ],

@@ -1,9 +1,18 @@
 from django.shortcuts import render #type: ignore
 from .models import Post
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib.auth import authenticate
 
-#import filename
+from django.views.decorators.csrf import csrf_exempt
+from ai_summ import summarizer
+from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
+#stupid stuff, should really import over models?
+#only damn reason I have these is for the tokens
+#maybe sessions would have been a better idea?
 
 # Create your views here.
 
@@ -24,9 +33,49 @@ def about(request):
 @csrf_exempt
 def summarize(request):
     bodyText = request.body.decode('utf-8')
-    #return filename.summarize(bodyText)
+    return HttpResponse(summarizer.summarize_text(bodyText))
 
 @csrf_exempt
 def questionGenerate(request):
     #bodyText = request.body.decode('utf-8')
     pass
+
+
+def login(request):
+
+    if request.method == "POST":
+        name = request.POST.get('username')
+        passKey = request.POST.get('password')
+         
+
+        if not User.objects.filter(username=name).exists(): #user doesn't exist
+
+            return JsonResponse({"error" : "Invalid User"}, status = 400)
+
+        user = authenticate(username=name, password=passKey) #
+         
+        if user is None: #This stupid thing is going to make me work with json 
+
+            return JsonResponse({"error" : "Invalid Pass"},  status = 400)
+        
+        else:
+
+            refresh = RefreshToken.for_user(user)
+
+            return JsonResponse({"accessToken" : str(refresh.access_token), "message" : "Authenticated Successfully"},  status = 200)
+     
+
+    return render(request, 'login.html')
+
+
+def register(request):
+    name = request.POST.get('username')
+    passKey = request.POST.get('password')
+
+    user = User.objects.create_user(username = name, password = passKey) #stores a nice hashed pass so I don't have to muck about with SDAs
+    user.save() #should register, have a check to check for existing accounts
+    return JsonResponse({"message" : "Authenticated Successfully"},  status = 200)
+    #hopefully this saves it over in the DB
+    #also, yeah, sorry users, you folks have to login after registration, not particularly fun to fiddle with all this logic
+
+    

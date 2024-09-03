@@ -1,19 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+
 import 'homepage.dart';
 import 'flashcardsPage.dart';
 import 'toolPage.dart';
 import 'summarizerPage.dart';
 import 'httpsTest.dart';
 
-void main() => runApp(const MyApp());
+class PreferenceUtils {
+  static SharedPreferences? _prefsInstance;
 
+  // This method should be called once during app initialization
+  static Future<void> init() async {
+    _prefsInstance = await SharedPreferences.getInstance();
+  }
+
+  static SharedPreferences get _instance {
+    if (_prefsInstance == null) {
+      throw StateError("SharedPreferences is not initialized. Call init() first.");
+    }
+    return _prefsInstance!;
+  }
+
+  static String getString(String key, [String? defValue]) {
+    return _instance.getString(key) ?? defValue ?? "";
+  }
+
+  static Future<bool> setString(String key, String value) async {
+    return _instance.setString(key, value);
+  }
+}
+
+void main() async
+{
+  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
+  await PreferenceUtils.init(); // Initialize PreferenceUtils
+
+  runApp(const MyApp());
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DataFetchingScreen(),
+      home: toolPage(),
 
       theme: ThemeData(
         textTheme: const TextTheme(

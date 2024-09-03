@@ -14,7 +14,7 @@ class _DataFetchingScreenState extends State<DataFetchingScreen>
 {
 
   Future fetchData() async {
-    final response = await http.post(Uri.parse('http://127.0.0.1:8000/about/'), body: "test");
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarize/'), body: "test");
     if (response.statusCode == 200) {
       // If the server returns a 200 OK response, parse the JSON
       return response.body;

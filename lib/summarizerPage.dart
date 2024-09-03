@@ -1,18 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Chat UI',
-      home: ChatScreen(),
-    );
-  }
-}
+
 
 class ChatScreen extends StatefulWidget {
   @override
@@ -23,14 +12,37 @@ class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
 
-  void _handleSubmitted(String text) {
+
+
+  Future fetchData(String userBody) async {
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarize/'), body: userBody);
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+      return response.body;
+    }
+    
+     else 
+     {
+      // If the server did not return a 200 OK response, throw an exception.
+      return 'Failed to load data. Try again';
+    }
+  }
+
+
+
+  void _handleSubmitted(String text) async {
+    print("skibid'");
+    String result = await fetchData(text);
     if (text.isNotEmpty) {
       _controller.clear();
       setState(() {
-        _messages.add(text);
+        _messages.add("User: " + text);
+        _messages.add("> " + result);
       });
     }
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -38,68 +50,109 @@ class _ChatScreenState extends State<ChatScreen> {
       
       body: Column(
         children: <Widget>[
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color.fromARGB(255,21,21,20),
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
 
+          TextBox(messages: _messages),
 
-                child: _messages.isEmpty
-                    ? Center(
-                        child: Text(
-                          'Nothing here yet! Get typing!',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                      )
-                    : ListView.builder(
-                        itemCount: _messages.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(left: 32, top: 16),
-                            child: Text("> " + _messages[index]),
-                          );
-                        },
-                      ),
-              ),
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    style: Theme.of(context).textTheme.labelMedium,
-                    
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Color.fromARGB(255,21,21,20),
-                      
-                    
-                      hintText: 'Enter your message here',
-                      hintStyle: Theme.of(context).textTheme.labelMedium,
-                      border: OutlineInputBorder(borderRadius : const BorderRadius.all(Radius.circular(12.0))),
-                    ),
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null, // Allows the input field to be scrollable
-                    onSubmitted: _handleSubmitted,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () => _handleSubmitted(_controller.text),
-                ),
-              ],
-            ),
+            child: UserInputField(controller: _controller, handleSubmitted: _handleSubmitted),
           ),
         ],
       ),
+    );
+  }
+}
+
+class TextBox extends StatelessWidget 
+{
+
+  const TextBox({
+    super.key,
+    required List<String> messages,
+  }) : _messages = messages;
+
+  final List<String> _messages;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255,21,21,20),
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+    
+    
+          child: _messages.isEmpty
+              ? Center(
+                  child: Text(
+                    'Nothing here yet! Get typing!',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 32, top: 16),
+                      child: (index % 2 == 0)  ?  Text("> " + _messages[index] , style: DefaultTextStyle.of(context).style.copyWith(color: Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
+                    );
+                  },
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+class UserInputField extends StatelessWidget {
+  const UserInputField({
+    super.key,
+    required TextEditingController controller,
+    required void Function(String) handleSubmitted,
+  }) : _controller = controller, _handleSubmitted = handleSubmitted;
+  
+
+  final TextEditingController _controller;
+  final void Function(String) _handleSubmitted;
+ 
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: TextField(
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(height: 1.5),
+            
+            controller: _controller,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Color.fromARGB(255,21,21,20),
+              
+            
+              hintText: 'Enter your message here',
+              hintStyle: Theme.of(context).textTheme.labelMedium,
+              border: OutlineInputBorder(borderRadius : const BorderRadius.all(Radius.circular(12.0))),
+            ),
+            keyboardType: TextInputType.multiline,
+            maxLines: null, // Allows the input field to be scrollable
+            onSubmitted: (text) => _handleSubmitted(text),
+            
+          ),
+        ),
+        IconButton(
+          icon: Icon(Icons.send),
+          onPressed: () => _handleSubmitted(_controller.text),
+        ),
+      ],
     );
   }
 }

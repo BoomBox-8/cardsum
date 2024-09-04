@@ -10,7 +10,8 @@ from django.views.decorators.csrf import csrf_exempt
 from ai_summ import summarizer
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from rest_framework.decorators import api_view
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 #stupid stuff, should really import over models?
 #only damn reason I have these is for the tokens
@@ -87,4 +88,14 @@ def registerUser(request):
         return JsonResponse({"error" : "Registraion Failed Due To Unspecified Reasons"},  status = 400)
 
 
+@api_view(['POST'])
+def get_user_info(request):
+    # The user is authenticated, so you can access the user instance directly
+    data = json.loads(request.body)
+    token = data.get('token')
+
+    # Retrieve the username from the user object
+    username = token.username
+
+    return JsonResponse({'username': username}, status=200)
     

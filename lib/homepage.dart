@@ -1,22 +1,59 @@
 import 'package:flutter/material.dart';
+import 'toolPage.dart';
+import 'loginPage.dart';
 
 
 
-
-class SecondPage extends StatelessWidget {
+class SecondPage extends StatefulWidget {
   const SecondPage({super.key});
 
   @override
+  State<SecondPage> createState() => _SecondPageState();
+}
+
+class _SecondPageState extends State<SecondPage> {
+
+  int _tabIndex = 0; //this lil guy helps us swap pages!!
+  Widget displayedPage = homePageWidget(); //nice default lad
+
+
+  void _swapWidgetCallback(int index)
+  {
+    setState(()
+    {
+      switch (index)
+      {
+        case 0:
+          displayedPage = LoginForm();
+          break;
+        
+        case 1:
+          displayedPage = toolPage();
+          break;
+
+        case 2:
+          displayedPage = LoginForm();
+          break;
+
+        case 3:
+          displayedPage = homePageWidget();
+          break;
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return  const Scaffold(backgroundColor: Color.fromARGB(255, 21, 21, 21),
+    return Scaffold(backgroundColor: Color.fromARGB(255, 21, 21, 21),
     
       body: Align(
         alignment: Alignment.topCenter,
         child: Column(
           
-          mainAxisSize: MainAxisSize.min,
-          children: [ homePageNavBar(),
-          Expanded(child: SingleChildScrollView(child: scrollableHome()))
+          mainAxisSize: MainAxisSize.max,
+          children: [ 
+          homePageNavBar( _swapWidgetCallback),
+          displayedPage,
          
             /*ElevatedButton(
               onPressed: () {
@@ -28,6 +65,17 @@ class SecondPage extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class homePageWidget extends StatelessWidget {
+  const homePageWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(child: SingleChildScrollView(child: scrollableHome()));
   }
 }
 
@@ -71,8 +119,8 @@ class scrollableHome extends StatelessWidget {
               
               const SizedBox(height: 30),
               Text("""Summarizes your documents into bite-sized cards? Check.\n
-              Integrated with quizlets? Check.\n
-              Saveable for offline use? Check.""", 
+Integrated with quizlets? Check.\n
+Saveable for offline use? Check.""", 
               style: Theme.of(context).textTheme.labelMedium,  textAlign: TextAlign.center),
               
               const SizedBox(height: 30),
@@ -118,36 +166,76 @@ class scrollableHome extends StatelessWidget {
   }
 }
 
-class homePageNavBar extends StatelessWidget {
-  const homePageNavBar({
-    super.key,
-  });
+class homePageNavBar extends StatefulWidget {
+  final void Function(int) tabCallback;
+
+  const homePageNavBar(
+    this.tabCallback,
+    {Key? key}
+  ) : super(key:key);
+
+  @override
+  State<homePageNavBar> createState() => _homePageNavBarState();
+}
+
+class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStateMixin {
+  int _tabIndex = 0;
+  late TabController _controller; //the fact I have to use a mixin in a ctor to avoid this is ridiculous
+  
+  
+  @override
+  void initState()
+  {
+    super.initState();
+    _controller = TabController(length : 4, vsync: this, initialIndex: 3);
+    _controller.addListener(() {setState(()
+    {
+      _tabIndex = _controller.index;
+      widget.tabCallback(_tabIndex);
+    });
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    
     return Container(color: const Color.fromARGB(255, 21, 21, 21),
-      child: Row(
-        children: [ Expanded(flex: 5, child: Padding(
+      child: Row(mainAxisAlignment : MainAxisAlignment.spaceBetween,
+        children: [ 
+          
+          Expanded(flex: 1, child: Padding(
           padding: const EdgeInsets.only(left: 24.0),
-          child: Text("Summer Proj", style: Theme.of(context).textTheme.bodyMedium),
+          child: Text("CardSum", style: Theme.of(context).textTheme.bodyMedium),
         )),
-          const Expanded(flex: 1,
+
+        SizedBox(width: 200,),
+
+
+          Expanded(flex: 1,
             child: DefaultTabController(
-              
-                length: 3, // Number of tabs
+                
+                length: 4, // Number of tabs
                 child: TabBar(
-                  dividerColor: Colors.transparent,
+                  
+                controller: _controller,
+                tabAlignment: TabAlignment.center,
+                dividerColor: Colors.transparent,
+
                  
 
-                  isScrollable: true,
-                  padding: EdgeInsets.only(left: 10, right: 10),
-                  indicatorPadding:  EdgeInsets.only(left: 10, right: 10),
-                  labelPadding:  EdgeInsets.only(left: 10, right: 10),
-                  tabs: <Widget>[
-                    Tab(child: Text("XYZ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
-                    Tab(child: Text("YYZ", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
-                    Tab(child: Text("ZZX", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway')))
+                isScrollable: true,
+                  
+
+                tabs: <Widget>[
+                    Tab(child: Text("Login/Register", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
+                    Tab(child: Text("Toolkit Page", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
+                    Tab(child: Text("Logout", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
+                    Tab(child: Text("Homepage", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway')))
+                    
                   ],
+                
+                
                 ),
               ),
           ),

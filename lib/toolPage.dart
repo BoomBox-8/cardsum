@@ -28,7 +28,7 @@ class _toolPageState extends State<toolPage> {
         break;
       
       case 2:
-        page = ChatScreen();
+        page = const ChatScreen();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -37,34 +37,35 @@ class _toolPageState extends State<toolPage> {
 
 
 
-    return Scaffold(
-      body: Row(children: 
-      [
-        NavigationRail(
-          extended: true,
-          leading:  Container(
-                  
-                  height: 128,
-                  width: 128, //disgusting magic number
-                  decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/placeholder.png"), fit: BoxFit.fill))),
-          
-          backgroundColor:  const Color.fromARGB(255, 23, 23, 31),
-          
-          destinations: [
-          NavigationRailDestination(icon: const Icon(Icons.sticky_note_2), label: Text("View Cards", style: Theme.of(context).textTheme.bodyMedium)),
-          NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
-          NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
-
-          ], selectedIndex: selectedIndex, onDestinationSelected: (value) {setState(()
-          {
-            selectedIndex = value;
-          });
-          
-          },), 
+    return Expanded(
+      child: Row(children: 
+        [
+          NavigationRail(
+            extended: true,
+            leading:  Container(
+                    
+                    height: 128,
+                    width: 128, //disgusting magic number
+                    decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/placeholder.png"), fit: BoxFit.fill))),
+            
+            backgroundColor:  const Color.fromARGB(255, 23, 23, 31),
+            
+            destinations: [
+            NavigationRailDestination(icon: const Icon(Icons.sticky_note_2), label: Text("View Cards", style: Theme.of(context).textTheme.bodyMedium)),
+            NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
+            NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
       
-      Expanded(child: Container( 
-        color: const Color.fromARGB(255, 21, 21, 21,), 
-        child: page  ),)]),);
+            ], selectedIndex: selectedIndex, onDestinationSelected: (value) {setState(()
+            {
+              selectedIndex = value;
+            });
+            
+            },), 
+        
+        Expanded(child: Container( 
+          color: const Color.fromARGB(255, 21, 21, 21,), 
+          child: page  ),)]),
+    );
   }
 }
 

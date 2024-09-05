@@ -23,3 +23,4 @@ class PreferenceUtils {
     return _instance.setString(key, value);
   }
 }
+

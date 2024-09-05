@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'toolPage.dart';
 import 'loginPage.dart';
+import 'package:summer_proj_app/preferenceUtils.dart';
+import 'package:summer_proj_app/dbUtils.dart';
 
 
 
@@ -206,7 +208,36 @@ class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStat
           
           Expanded(flex: 1, child: Padding(
           padding: const EdgeInsets.only(left: 24.0),
-          child: Text("CardSum", style: Theme.of(context).textTheme.bodyMedium),
+          child: Row(
+            children: [
+              Text("CardSum", style: Theme.of(context).textTheme.bodyMedium),
+              SizedBox(width: 20),
+              FutureBuilder<String>(
+          future: getUsername(),
+          builder: (context, snapshot)
+          {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();  
+            } 
+            
+            else if (snapshot.error == 401) 
+            {
+              return  SelectableText('User: Logged Out', style: Theme.of(context).textTheme.labelMedium);  
+            }
+            
+             else if (snapshot.hasData) 
+             {
+              return Text(("Current User: " + snapshot.data!), style: Theme.of(context).textTheme.labelMedium);  
+            } 
+            
+            else {
+              return Text('User: Unspecified Error ${snapshot.error}', style: Theme.of(context).textTheme.labelMedium );  
+            }
+          }
+        ),
+              
+            ],
+          ),
         )),
 
         SizedBox(width: 200,),

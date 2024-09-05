@@ -1,7 +1,7 @@
 import json
 
 from django.shortcuts import render #type: ignore
-from .models import Post
+from .models import Post, FlashcardsManager
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
 from ai_summ import summarizer
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -85,17 +85,87 @@ def registerUser(request):
 
 
     else:
-        return JsonResponse({"error" : "Registraion Failed Due To Unspecified Reasons"},  status = 400)
+        return JsonResponse({"error" : "Registration Failed Due To Unspecified Reasons"},  status = 400)
 
 
 @api_view(['POST'])
-def get_user_info(request):
+@csrf_exempt
+def getUserInfo(request):
     # The user is authenticated, so you can access the user instance directly
     data = json.loads(request.body)
-    token = data.get('token')
+    print(data)
+    token = data.get('authToken')
+    print(token)
 
     # Retrieve the username from the user object
-    username = token.username
+    userID = AccessToken(token)['user_id']
+    user = User.objects.get(id = userID)
+
+    username = user.username
+    print(username)
 
     return JsonResponse({'username': username}, status=200)
+
+@api_view(['POST'])
+@csrf_exempt
+def registerFlashcard(request):
+    if request.method == "POST":
+        flashcard = FlashcardsManager.create_flashcard(request) 
+        flashcard.save() 
+        ''' data = json.loads(request.body)
+
+        userid = data.get('user_id')
+        title = data.get('title')
+        topic = data.get('topic')
+        text = data.get('topic')'''
+
+        
+
+        return JsonResponse({"message" : "Flashcard Created Successfully"},  status = 200)
+        #hopefully this saves it over in the DB
+
+
+    else:
+        return JsonResponse({"error" : "Flashcard Creation Failed Due To Unspecified Reasons"},  status = 400)
+    
+
+@api_view(['POST'])
+@csrf_exempt
+def getFlashcards(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        userid = data.get('user_id')
+        
+
+
+        flashcards = FlashcardsManager.get_flashcards(userid)
+    
+
+        return JsonResponse({"message" : "Flashcard Created Successfully"},  status = 200)
+        #hopefully this saves it over in the DB
+        #get back to this later, need to find out how to provide a JSON file of all flashcards and use a listBuilder to build them
+
+    else:
+        return JsonResponse({"error" : "Flashcard Creation Failed Due To Unspecified Reasons"},  status = 400)
+    
+
+@api_view(['POST'])
+@csrf_exempt
+def getFlashcard(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        flashcardId = data.get('flashcardId')
+        
+
+
+        flashcard = FlashcardsManager.get_flashcard(flashcardId)
+    
+
+        return JsonResponse({"topic" : flashcard.title, "title" : flashcard.title, "text" : flashcard.text},  status = 200)
+
+
+    else:
+        return JsonResponse({"error" : "Flashcard Creation Failed Due To Unspecified Reasons"},  status = 400)
     

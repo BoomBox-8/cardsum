@@ -1,6 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:summer_proj_app/dbUtils.dart';
 import 'flashcardsPage.dart';
 import 'summarizerPage.dart';
+import 'createFlashcardPage.dart';
+
+import 'package:summer_proj_app/preferenceUtils.dart';
+import 'package:http/http.dart' as http;
+
+
 
 class toolPage extends StatefulWidget
 {
@@ -12,6 +21,7 @@ class toolPage extends StatefulWidget
 
 class _toolPageState extends State<toolPage> {
   int selectedIndex = 0;
+  String dbName = "Not Logged In/Loading: ";
 
 
   @override
@@ -21,7 +31,7 @@ class _toolPageState extends State<toolPage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = const Placeholder();
+        page =  Placeholder();
         break;
       case 1:
         page = const FlashcardScreenContainer();
@@ -30,6 +40,11 @@ class _toolPageState extends State<toolPage> {
       case 2:
         page = const ChatScreen();
         break;
+
+      case 3:
+        page = const CreateFlashCard();
+        break;
+
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -54,7 +69,7 @@ class _toolPageState extends State<toolPage> {
             NavigationRailDestination(icon: const Icon(Icons.sticky_note_2), label: Text("View Cards", style: Theme.of(context).textTheme.bodyMedium)),
             NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
             NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
-      
+            NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Create Flashcard", style: Theme.of(context).textTheme.bodyMedium)),
             ], selectedIndex: selectedIndex, onDestinationSelected: (value) {setState(()
             {
               selectedIndex = value;

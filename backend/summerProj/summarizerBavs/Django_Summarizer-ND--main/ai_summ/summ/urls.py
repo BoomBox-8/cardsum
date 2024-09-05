@@ -6,5 +6,7 @@ urlpatterns = [
     path('about/', views.about, name='summ-about'),
     path('summarize/', views.summarize, name = 'summ-summarizer'),
     path('login/', views.login, name='summ-login'),
-    path('registerUser/', views.registerUser, name='summ-register')
+    path('registerUser/', views.registerUser, name='summ-register'),
+    path('getUserInfo/', views.getUserInfo, name='summ-getUserInfo'),
+    path('registerFlashcard/', views.registerFlashcard, name='summ-registerFlashcard')
 ]

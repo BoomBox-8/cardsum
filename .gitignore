@@ -42,13 +42,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Django/Python related files
-venv/
-__pycache__/
-*.py[cod]
-db.sqlite3
-*.sqlite3
-*.log
 
-# Environment variables
-.env
+

@@ -113,14 +113,19 @@ def plaintext_summarizer(text):
         summarized_sentences = nlargest(7, sentence_scores, key=sentence_scores.get)
         final_sentences = [ w.text for w in summarized_sentences ]
         summary = ' '.join(final_sentences)
-        return summary
+
+        summarizerContainerObj = summarizerContainer()
+        summarizerContainerObj.generate_questions(summary)
+
+
+        return f'{summary}\nQuestion Time!\n{summarizerContainerObj.generate_questions(summary)}'
 
 
 
 class summarizerContainer():
     
-    def __init__(self, client): #pass a client handle to an instance of this
-        self.client = client
+    def __init__(self): #pass a client handle to an instance of this
+        
         self.questionsDict = {} #really shouldn't be here
         self.points=0
         self.clientObj = OpenAI()
@@ -128,16 +133,17 @@ class summarizerContainer():
     #TEXT SUMMARIZER CODE USING SPACY
     
     #QUESTION GENERATOR USING OPEN AI HERE
-    def generate_questions(self, filename):
+   
+    def generate_questions(self, text):
         """
         Reads text from a file, sends it to OpenAI, and generates multiple-choice
         questions testing reading comprehension on the topic.
         """
-        text = read_file(filename)
+       
         if text is None:
             return
 
-        completion = self.client.chat.completions.create(
+        completion = self.clientObj.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You will be provided with a big text. You must then generate several multiple-choice questions testing one's reading comprehension on that topic. There should be 4 choices. In the final line should be the answer from one of the four choices. So totally 6 lines of text. Generate atleast five questions"},
@@ -146,33 +152,39 @@ class summarizerContainer():
         )
 
         questions = completion.choices[0].message.content.split("\n\n")
-        print(f"Comprehension Questions:\n")
+        #print(f"Comprehension Questions:\n")
+        totalText = ''
+
         for question in questions:
             lines = question.strip().splitlines()
             #print(lines)
+
+
             if len(lines) < 3:
                 print(f"Error: Invalid question format: {question}")
                 continue
+
+
             question_text = lines[0]
             choices = lines[1:-1]
             option = lines[-1].split(": ")[-1]
+
+            
             #print(option[0])
-            print(f"{question_text}")
+            #print(f"{question_text}")
+            totalText += '\n' + question_text
             for i, choice in enumerate(choices):
-                print(f"{choice}")
+                totalText += "\n" + choice
+            
+            
+
+        return totalText
             #print("this?",option[0])
             #print(f"{option}")
-            self.questionsDict[question_text]=option[0]
-            answer_from_user=input("Enter a choice A,B,C,D\n")
+            #self.questionsDict[question_text]=option[0]
             
-            if answer_from_user==self.questionsDict[question_text]:
-                print("correct choice! you get 5 points")
-                self.points+=5
-            else:
-                print("oops")
-            print("The right answer is ",option)
-        print("Your total score is ",self.points)
-       
+            
+            
 
         
 #clientObj = OpenAI()

@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate
 
 from django.views.decorators.csrf import csrf_exempt
 from ai_summ import summarizer
+from ai_summ import summarizerv2
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.decorators import api_view
@@ -36,7 +37,7 @@ def about(request):
 @csrf_exempt
 def summarize(request):
     bodyText = request.body.decode('utf-8')
-    return HttpResponse(summarizer.summarize_text(bodyText))
+    return HttpResponse(summarizerv2.plaintext_summarizer(bodyText))
 
 @csrf_exempt
 def questionGenerate(request):

@@ -13,13 +13,18 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   String _errorMessage = '';
   //callback to head to home page here
 
 
+  bool loginValidator()
+  {
+    final FormState form = _formKey.currentState!;
+    return form.validate();
+  }
   Future<bool> _authenticate(String username, String password) async {
   const url = 'http://127.0.0.1:8000/login/';
 
@@ -77,7 +82,8 @@ class _LoginFormState extends State<LoginForm> {
 //maybe pipe all this to the login form to be displayed
 
 
-  Future<bool> _registerUser(String username, String password) async {
+  Future<bool> _registerUser(String username, String password) async 
+  {
   const url = 'http://127.0.0.1:8000/registerUser/';
 
   try {
@@ -208,7 +214,7 @@ class _LoginFormState extends State<LoginForm> {
                                       hintText: 'Enter your username here',
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Please enter your username';
+                                          return 'Please enter a valid username';
                                         }
                                         return null;
                                       },
@@ -222,8 +228,8 @@ class _LoginFormState extends State<LoginForm> {
                                       labelText: 'Password',
                                       hintText: 'Enter your password here',
                                       validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your password';
+                                        if (value == null || value.isEmpty || value.length < 7) {
+                                          return 'Please enter a valid password. Minimum length of 7 characters ';
                                         }
                                         return null;
                                       },
@@ -234,7 +240,12 @@ class _LoginFormState extends State<LoginForm> {
                                    
                                     const SizedBox(height: 40),
                                      ElevatedButton(
-                                      onPressed: _login,
+                                      onPressed: () { if (loginValidator())
+                                      {
+                                        _login();
+                                      }
+                                      },
+
                                       style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
                                       child: const Text('Login', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'),),
                                     ),
@@ -242,7 +253,11 @@ class _LoginFormState extends State<LoginForm> {
                                     
                                     const SizedBox(height: 40),
                                      ElevatedButton(
-                                      onPressed: _register,
+                                      onPressed: () { if (loginValidator())
+                                      {
+                                        _register();
+                                      }
+                                      },
                                       style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
                                       child: const Text('Register', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'),),
                                     ),
@@ -305,11 +320,12 @@ class RoundedTextFormField extends StatelessWidget {
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,
-          labelStyle: const TextStyle(color: Color.fromARGB(255, 111, 111, 111), fontFamily: 'Raleway'),
+          labelStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: Color.fromARGB(255, 111, 111, 111)),
 
           hintText: hintText,
-          hintStyle: const TextStyle(color: Color.fromARGB(255, 111, 111, 111), fontFamily: 'Raleway')
+          hintStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: Color.fromARGB(255, 111, 111, 111)),
           
+          errorStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.red)
         ),
         validator: validator,
       ),

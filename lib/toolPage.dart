@@ -5,6 +5,8 @@ import 'package:summer_proj_app/dbUtils.dart';
 import 'flashcardsPage.dart';
 import 'summarizerPage.dart';
 import 'createFlashcardPage.dart';
+import 'viewCardsPage.dart';
+
 
 import 'package:summer_proj_app/preferenceUtils.dart';
 import 'package:http/http.dart' as http;
@@ -31,7 +33,7 @@ class _toolPageState extends State<toolPage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page =  Placeholder();
+        page =  viewCardsPage();
         break;
       case 1:
         page = const FlashcardScreenContainer();
@@ -121,7 +123,7 @@ class FlashcardScreenContainer extends StatelessWidget {
       
       
             children: [
-              const FlashcardScreen(),
+              FlashcardScreen(title : "die", topic: "fur",  text : "john"),
       
               const SizedBox(height: 30),
       

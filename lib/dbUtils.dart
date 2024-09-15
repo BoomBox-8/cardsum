@@ -48,7 +48,7 @@ Future<void> createFlashcard(String topic, String title, String text) async {
     }),
   );
 
-  if (response.statusCode == 201) {
+  if (response.statusCode == 200) {
     print('Flashcard created successfully');
   } else {
     print('Failed to create flashcard: ${response.body}');

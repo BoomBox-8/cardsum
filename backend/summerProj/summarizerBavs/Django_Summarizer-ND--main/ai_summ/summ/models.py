@@ -40,7 +40,7 @@ class FlashcardsManager():
     @staticmethod
     def get_flashcards(user_id):
         
-        flashcards = Flashcard.objects.filter(user_id=user_id)
+        flashcards = list(Flashcard.objects.filter(user_id=user_id))
         return flashcards
     
     @staticmethod

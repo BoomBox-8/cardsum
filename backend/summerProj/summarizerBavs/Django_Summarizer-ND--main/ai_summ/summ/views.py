@@ -136,19 +136,23 @@ def getFlashcards(request):
     if request.method == "POST":
         data = json.loads(request.body)
 
-        userid = data.get('user_id')
+        token = data.get('authToken')
+        userID = AccessToken(token)['user_id']
+        print(userID)
+       
         
 
 
-        flashcards = FlashcardsManager.get_flashcards(userid)
-    
+        flashcards = FlashcardsManager.get_flashcards(userID)
+        flashcardsArr = [{'topic' : i.topic, 'title' : i.title , 'text' : i.text } for i in flashcards]
+        print(flashcardsArr)
 
-        return JsonResponse({"message" : "Flashcard Created Successfully"},  status = 200)
-        #hopefully this saves it over in the DB
+        return JsonResponse({"flashcards" : flashcardsArr},  status = 200)
+
         #get back to this later, need to find out how to provide a JSON file of all flashcards and use a listBuilder to build them
 
     else:
-        return JsonResponse({"error" : "Flashcard Creation Failed Due To Unspecified Reasons"},  status = 400)
+        return JsonResponse({"error" : "Unspecified Error"},  status = 400)
     
 
 @api_view(['POST'])

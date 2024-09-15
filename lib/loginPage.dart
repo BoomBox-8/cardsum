@@ -266,7 +266,7 @@ class _LoginFormState extends State<LoginForm> {
                                     const SizedBox(height: 20, width: 60),
                                     Text(
                                       _errorMessage,
-                                      style: const TextStyle(color: Colors.red, fontFamily: 'Raleway'),
+                                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.red),
                                     ),
                                   ],
                                 ),

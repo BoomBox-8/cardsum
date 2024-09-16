@@ -44,10 +44,12 @@ class FlashcardsManager():
         return flashcards
     
     @staticmethod
-    def get_flashcard(flashcard_id): #ONE, JUST ONE, NOT MORE NOT LESS
+    def get_flashcard(user_id, index): #ONE, JUST ONE, NOT MORE NOT LESS
         
-        flashcard = Flashcard.objects.get(id=flashcard_id)
-        return flashcard
+        
+        flashcard = Flashcard.objects.filter(user_id=user_id)
+        count = flashcard.count()
+        return list(flashcard)[index%count]
     
 
     @staticmethod

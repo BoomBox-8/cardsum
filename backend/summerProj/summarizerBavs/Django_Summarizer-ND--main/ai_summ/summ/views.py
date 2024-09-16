@@ -160,17 +160,19 @@ def getFlashcards(request):
 def getFlashcard(request):
     if request.method == "POST":
         data = json.loads(request.body)
+        token = data.get('authToken')
+        userID = AccessToken(token)['user_id']
+        flashcardIndex = data.get('flashcardIndex')
 
-        flashcardId = data.get('flashcardId')
-        
 
+        flashcard = FlashcardsManager.get_flashcard(userID, flashcardIndex) #array wiht one ele just for a consistent interface
+        flashcardsArr = [{'topic' : flashcard.topic, 'title' : flashcard.title , 'text' : flashcard.text}]
 
-        flashcard = FlashcardsManager.get_flashcard(flashcardId)
-    
+        print(flashcardsArr)
 
-        return JsonResponse({"topic" : flashcard.title, "title" : flashcard.title, "text" : flashcard.text},  status = 200)
+        return JsonResponse({"flashcards" : flashcardsArr},  status = 200)
 
 
     else:
-        return JsonResponse({"error" : "Flashcard Creation Failed Due To Unspecified Reasons"},  status = 400)
+        return JsonResponse({"error" : "Unspecified Error"},  status = 400)
     

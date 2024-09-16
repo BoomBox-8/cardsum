@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:summer_proj_app/dbUtils.dart';
+import 'package:summer_proj_app/flashcard_screen_container.dart';
 import 'flashcardsPage.dart';
 import 'summarizerPage.dart';
 import 'createFlashcardPage.dart';
@@ -36,7 +37,7 @@ class _toolPageState extends State<toolPage> {
         page =  viewCardsPage();
         break;
       case 1:
-        page = const FlashcardScreenContainer();
+        page =  FlashcardScreenContainer();
         break;
       
       case 2:
@@ -82,79 +83,6 @@ class _toolPageState extends State<toolPage> {
         Expanded(child: Container( 
           color: const Color.fromARGB(255, 21, 21, 21,), 
           child: page  ),)]),
-    );
-  }
-}
-
-class FlashcardScreenContainer extends StatelessWidget {
-  const FlashcardScreenContainer({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 100),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-      
-        children: [
-          Column(mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              ElevatedButton(
-                            onPressed: ()=>print("Placeholder"),
-        
-                            style: ElevatedButton.styleFrom(minimumSize: const Size(36, 45), backgroundColor: const Color.fromARGB(255, 81, 81, 163), padding: const EdgeInsets.all(12)),
-                            child: Text('Delete Flashcard', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255), height: 1.3, fontSize: 20), textAlign: TextAlign.center,),
-                          ),
-      
-              const SizedBox(height: 180),          
-              IconButton.filled(onPressed: () {
-                print("skibidi");
-                } , icon: const Icon(Icons.arrow_back_rounded)),
-            ],
-          ),
-      
-          const SizedBox(width: 30),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-      
-      
-            children: [
-              FlashcardScreen(title : "die", topic: "fur",  text : "john"),
-      
-              const SizedBox(height: 30),
-      
-              ElevatedButton(
-                            onPressed: ()=>print("Placeholder"),
-        
-                            style: ElevatedButton.styleFrom(minimumSize: const Size(36, 45), backgroundColor: const Color.fromARGB(255, 81, 81, 163), padding: const EdgeInsets.all(12)),
-                            child: Text('Regenerate Text', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255), height: 1.3, fontSize: 20), textAlign: TextAlign.center,),
-                          ),
-            ],
-          ),
-        
-        const SizedBox(width: 30),
-        Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [ElevatedButton(
-                            onPressed: ()=>print("Placeholder"),
-        
-                            style: ElevatedButton.styleFrom(minimumSize: const Size(36, 45), backgroundColor: const Color.fromARGB(255, 81, 81, 163), padding: const EdgeInsets.all(12)),
-                            child: Text('Edit Flashcard', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255), height: 1.3, fontSize: 20), textAlign: TextAlign.center,),
-                          ),
-      
-              const SizedBox(height: 180),   
-            IconButton.filled(onPressed: () {
-                print("skibidi");
-                } , icon: const Icon(Icons.arrow_forward_rounded)),
-          ],
-        ),
-      
-          const SizedBox(width: 30),],
-      ),
     );
   }
 }

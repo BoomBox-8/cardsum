@@ -4,12 +4,12 @@ import 'dbUtils.dart';
 
 
 class FlashcardScreen extends StatefulWidget {
-  final String title;
-  final String topic;
-  final String text;
+  String title;
+  String topic;
+  String text;
 
   // Updated constructor with additional parameters
-  const FlashcardScreen({
+   FlashcardScreen({
     Key? key,
     required this.title,
     required this.topic,

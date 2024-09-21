@@ -7,6 +7,8 @@ class FlashcardScreen extends StatefulWidget {
   String title;
   String topic;
   String text;
+  int flashID;
+
 
   // Updated constructor with additional parameters
    FlashcardScreen({
@@ -14,6 +16,7 @@ class FlashcardScreen extends StatefulWidget {
     required this.title,
     required this.topic,
     required this.text,
+    required this.flashID,
   }) : super(key: key);
         
 

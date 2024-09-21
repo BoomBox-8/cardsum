@@ -298,7 +298,7 @@ class RoundedTextFormField extends StatelessWidget {
     required this.controller,
     required this.labelText,
     required this.obscureText,
-    this.hintText = '',
+    required this.hintText,
     
     this.validator,
   });

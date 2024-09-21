@@ -53,9 +53,9 @@ class FlashcardsManager():
     
 
     @staticmethod
-    def update_flashcard(flashcard_id, topic = None, title=None, text=None, ):
+    def update_flashcard(user_id, flashcard_id, topic = None, title=None, text=None, ):
         
-        flashcard = Flashcard.objects.get(id=flashcard_id)
+        flashcard = Flashcard.objects.get(user_id = user_id, id=flashcard_id)
         if title:
             flashcard.title = title
         if topic:
@@ -69,10 +69,13 @@ class FlashcardsManager():
         
 
     @staticmethod
-    def delete_flashcard(flashcard_id):
-   
-        flashcard = Flashcard.objects.get(id=flashcard_id)
+    def delete_flashcard(user_id, flashcard_id):
+        print('inside delete')
+        print(flashcard_id)
+        flashcard = Flashcard.objects.get(user_id = user_id , pk=flashcard_id)
         flashcard.delete()
+
+        print('inside delete workded')
         return True
 
 

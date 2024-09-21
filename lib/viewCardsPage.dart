@@ -85,7 +85,8 @@ class _FlashcardScreenState extends State<viewCardsPage> {
          FlashcardScreen(
           title: flashcard['title'], 
           topic: flashcard['topic'], 
-          text: flashcard['text']
+          text: flashcard['text'],
+          flashID: flashcard['flashID'],
         );
     },
   );

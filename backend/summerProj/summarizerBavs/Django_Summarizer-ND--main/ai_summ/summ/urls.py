@@ -10,5 +10,7 @@ urlpatterns = [
     path('getUserInfo/', views.getUserInfo, name='summ-getUserInfo'),
     path('registerFlashcard/', views.registerFlashcard, name='summ-registerFlashcard'),
     path('getFlashcards/', views.getFlashcards, name='summ-getFlashcards'),
-    path('getFlashcard/', views.getFlashcard, name='summ-getFlashcard')
+    path('getFlashcard/', views.getFlashcard, name='summ-getFlashcard'),
+    path('deleteFlashcard/', views.deleteFlashcard, name='summ-deleteFlashcard'),
+    path('updateFlashcard/', views.updateFlashcard, name='summ-updateFlashcard'),
 ]

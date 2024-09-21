@@ -144,7 +144,7 @@ def getFlashcards(request):
 
 
         flashcards = FlashcardsManager.get_flashcards(userID)
-        flashcardsArr = [{'topic' : i.topic, 'title' : i.title , 'text' : i.text } for i in flashcards]
+        flashcardsArr = [{'topic' : i.topic, 'title' : i.title , 'text' : i.text, 'flashID' :i.id } for i in flashcards]
         print(flashcardsArr)
 
         return JsonResponse({"flashcards" : flashcardsArr},  status = 200)
@@ -166,7 +166,7 @@ def getFlashcard(request):
 
 
         flashcard = FlashcardsManager.get_flashcard(userID, flashcardIndex) #array wiht one ele just for a consistent interface
-        flashcardsArr = [{'topic' : flashcard.topic, 'title' : flashcard.title , 'text' : flashcard.text}]
+        flashcardsArr = [{'topic' : flashcard.topic, 'title' : flashcard.title , 'text' : flashcard.text, 'flashID' : flashcard.id}]
 
         print(flashcardsArr)
 
@@ -176,3 +176,50 @@ def getFlashcard(request):
     else:
         return JsonResponse({"error" : "Unspecified Error"},  status = 400)
     
+
+
+@api_view(['POST'])
+@csrf_exempt
+def deleteFlashcard(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        
+        token = data.get('authToken')
+        userID = AccessToken(token)['user_id']
+        flashID = data.get('flashID')
+        print(flashID)
+        print("delete run debug check")
+
+        flashcard = FlashcardsManager.delete_flashcard(userID, flashID) #wipes
+        
+
+        return JsonResponse({"status" : "Successfully deleted"},  status = 200)
+
+
+    else:
+        return JsonResponse({"error" : "Unspecified Error"},  status = 400)
+    
+
+@api_view(['POST'])
+@csrf_exempt
+def updateFlashcard(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        
+        token = data.get('authToken')
+        userID = AccessToken(token)['user_id']
+        flashID = data.get('flashID')
+        
+        topicCard = data.get("topic")
+        titleCard = data.get("title")
+        textCard = data.get("text")
+
+
+        flashcard = FlashcardsManager.update_flashcard(userID, flashID, topic = topicCard, title = titleCard, text = textCard) #wipes
+        
+
+        return JsonResponse({"status" : "Successfully updated"},  status = 200)
+
+
+    else:
+        return JsonResponse({"error" : "Unspecified Error"},  status = 400)

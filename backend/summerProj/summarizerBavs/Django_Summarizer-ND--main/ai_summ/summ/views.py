@@ -40,9 +40,47 @@ def summarize(request):
     return HttpResponse(summarizerv2.plaintext_summarizer(bodyText))
 
 @csrf_exempt
+def summarizeToFlashcards(request):
+    data = json.loads(request.body)
+    summarizerContainerObj = summarizerv2.summarizerContainer()
+    flashcardsList = summarizerContainerObj.generate_flashcards(request.body.decode('utf-8'))
+    print(f"Here be flashcard amount: {len(flashcardsList)}")
+
+    if request.method == "POST":
+        
+        for i in flashcardsList:
+            
+            print(f"HERE BE FLASHCARD EACH {repr(i)}")
+            topic = i[2]
+            title = i[1]
+            text = i[3]
+
+            
+
+            request.topic = topic
+            request.title = title
+            request.content = text
+
+            flashcard = FlashcardsManager.create_flashcard(request) 
+            flashcard.save() 
+
+            #what in the spaghetti code
+    return JsonResponse({"message" : "Operation Finished Successfully"},  status = 200)
+
+
+
+@csrf_exempt
 def questionGenerate(request):
-    #bodyText = request.body.decode('utf-8')
-    pass
+    summarizerContainerObj = summarizerv2.summarizerContainer()
+    mcqDict = summarizerContainerObj.generate_questions(json.loads(request.body)['topic']) #quesiton+answer block + the corresponding right option
+
+    if len(mcqDict) < 3:
+        return JsonResponse({"error" : "Failed Question Generation"}, status = 400)
+    
+    #print(mcqDict)
+
+    return JsonResponse({"questions" : mcqDict}, status = 200)
+
 
 @csrf_exempt
 def login(request):

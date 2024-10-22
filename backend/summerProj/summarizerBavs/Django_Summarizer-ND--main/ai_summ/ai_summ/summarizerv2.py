@@ -118,7 +118,7 @@ def plaintext_summarizer(text):
         summarizerContainerObj.generate_questions(summary)
 
 
-        return f'{summary}\nQuestion Time!\n{summarizerContainerObj.generate_questions(summary)}'
+        return f'{summary}\n'
 
 
 
@@ -154,7 +154,7 @@ class summarizerContainer():
         questions = completion.choices[0].message.content.split("\n\n")
         #print(f"Comprehension Questions:\n")
         totalText = ''
-
+        mcqDict = {}
         for question in questions:
             lines = question.strip().splitlines()
             #print(lines)
@@ -172,16 +172,78 @@ class summarizerContainer():
             
             #print(option[0])
             #print(f"{question_text}")
-            totalText += '\n' + question_text
+            totalText = question_text
+            choiceText = ''
             for i, choice in enumerate(choices):
-                totalText += "\n" + choice
+                choiceText += "\n" + choice
+
+
+            mcqDict[totalText] = {choiceText : option}
             
             
 
-        return totalText
+        return mcqDict
             #print("this?",option[0])
             #print(f"{option}")
             #self.questionsDict[question_text]=option[0]
+        
+    def generate_flashcards(self, text, num_flashcards=5):
+        """
+        Reads text from a file, sends it to OpenAI, and generates multiple flashcards
+        each with a title, topic, and content summary.
+        """
+        if text is None:
+            return
+
+        # Send a request to OpenAI for multiple flashcards
+        completion = self.clientObj.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": f"""You will be provided with a large text. Generate content enough for multiple flashcards. Each content should provide title, topic and text summary
+
+Generate multiple such cards. Use only plain text throughout. Separate them everything using double newlines"""},
+                {"role": "user", "content": text},
+            ]
+        )
+
+        escapeCounter = 0
+        flashcards = completion.choices[0].message.content.split("---")
+
+        while (len(flashcards) < 3):
+            completion = self.clientObj.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": f"""You will be provided with a large text. Generate content enough for multiple flashcards. Each content should provide title, topic and text summary
+
+Generate multiple such cards. Use only plain text throughout. Separate them everything using double newlines"""},
+                {"role": "user", "content": text},
+            ]
+        )
+            escapeCounter += 1
+            if escapeCounter > 5:
+                break #stupid measure to jump out early so it doesnt eat credits
+            
+            #some stupid heuristic to force this thing to keep giving it the output I want
+        flashcards = [i.strip() for i in flashcards] #remove any annoying white-space
+
+
+        print(flashcards)
+        print("HERE IS THE RESPONSE FROM GPT FOR FLASHCARDS")
+
+
+        flashcards_list = []
+        for i in flashcards:
+            currentFlashList = i.split('\n\n')
+            flashcards_list.append([
+                ''.join(currentFlashList[1].split('Title: ')),
+                ''.join(currentFlashList[2].split('Topic: ')),
+                ''.join(currentFlashList[3].split('Content Summary: '))
+                                    ])
+
+        return (flashcards_list)
+    
+
+    
             
             
             

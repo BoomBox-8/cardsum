@@ -21,7 +21,7 @@ class FlashcardsManager():
     @staticmethod
     def create_flashcard(request): #using snake case against my will
         data = json.loads(request.body)
-     
+        print(f"Data Body  here is : {data} ")
 
         token = data.get('authToken')
         userID = AccessToken(token)['user_id']
@@ -29,7 +29,7 @@ class FlashcardsManager():
 
         topic = data.get('topic')
         title = data.get('title')
-        text = data.get('text')
+        text = data.get('content') #done so I don't mess with Django's WSGI objects potentially including text attr, saw this late
 
 
         flashcard = Flashcard(user = userObj, topic = topic, title = title, text = text)

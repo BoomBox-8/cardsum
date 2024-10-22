@@ -3,10 +3,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:summer_proj_app/dbUtils.dart';
 import 'package:summer_proj_app/flashcard_screen_container.dart';
+import 'package:summer_proj_app/questionPage.dart';
 import 'flashcardsPage.dart';
 import 'summarizerPage.dart';
 import 'createFlashcardPage.dart';
 import 'viewCardsPage.dart';
+import 'questionPage.dart';
 
 
 import 'package:summer_proj_app/preferenceUtils.dart';
@@ -48,6 +50,9 @@ class _toolPageState extends State<toolPage> {
         page = const CreateFlashCard();
         break;
 
+      case 4:
+        page = const MCQPage();
+
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
@@ -73,6 +78,7 @@ class _toolPageState extends State<toolPage> {
             NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Edit Cards", style: Theme.of(context).textTheme.bodyMedium)),
             NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Summarize Text", style: Theme.of(context).textTheme.bodyMedium)),
             NavigationRailDestination(icon: const Icon(Icons.recycling), label: Text("Create Flashcard", style: Theme.of(context).textTheme.bodyMedium)),
+            NavigationRailDestination(icon: const Icon(Icons.question_mark), label: Text("Question Zone", style: Theme.of(context).textTheme.bodyMedium))
             ], selectedIndex: selectedIndex, onDestinationSelected: (value) {setState(()
             {
               selectedIndex = value;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-
+import 'package:summer_proj_app/preferenceUtils.dart'; 
+import 'dart:convert';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -13,6 +13,8 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
+  bool _generateFlashcard = false;  // Add this to _ChatScreenState
+
 
 
 
@@ -33,16 +35,47 @@ class _ChatScreenState extends State<ChatScreen> {
 
 
   void _handleSubmitted(String text) async {
-    print("skibid'");
-    String result = await fetchData(text);
-    if (text.isNotEmpty) {
-      _controller.clear();
-      setState(() {
-        _messages.add("User: $text");
-        _messages.add("> $result");
-      });
+  print("skibid'");
+  
+  // Check if the checkbox is checked
+  
+  
+  String result = await fetchData(text);
+  if (text.isNotEmpty) {
+    _controller.clear();
+    setState(() {
+      _messages.add("User: $text");
+      _messages.add("> $result");
+    });
+
+
+    if (_generateFlashcard) {
+      String token = PreferenceUtils.getString("authToken");
+    
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeToFlashcards/'), headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',  // Include the auth token here
+        },
+        body: jsonEncode({
+          "authToken": token,  // You can include the token in the body if needed
+          "text": text,        // Send the original user text
+          "result": result,    // The summarized result you already fetched
+        }),);
+    if (response.statusCode == 200) {
+      // If the server returns a 200 OK response, parse the JSON
+       print(response.body);
     }
+    
+     else 
+     {
+      // If the server did not return a 200 OK response, throw an exception.
+       print('Failed to load data. Try again');
+    }
+    
+    return; // Do nothing else
   }
+  }
+}
 
   
 
@@ -57,7 +90,13 @@ class _ChatScreenState extends State<ChatScreen> {
 
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: UserInputField(controller: _controller, handleSubmitted: _handleSubmitted),
+            child: UserInputField(controller: _controller, handleSubmitted: _handleSubmitted, generateFlashcard: _generateFlashcard,
+            onGenerateFlashcardChanged:(bool? value) {
+              setState(() {
+                //print("Skibid changed");
+                _generateFlashcard = value ?? false;  // Update checkbox value
+              });
+            } ,),
           ),
         ],
       ),
@@ -100,7 +139,7 @@ class TextBox extends StatelessWidget
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 32, top: 16),
-                      child: (index % 2 == 0)  ?  Text("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
+                      child: (index % 2 == 0)  ?  SelectableText("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
                     );
                   },
                 ),
@@ -117,14 +156,17 @@ class UserInputField extends StatelessWidget {
     super.key,
     required TextEditingController controller,
     required void Function(String) handleSubmitted,
-  }) : _controller = controller, _handleSubmitted = handleSubmitted;
-  
+    required bool generateFlashcard,  // Pass the checkbox value
+    required void Function(bool?) onGenerateFlashcardChanged,  // Pass a function to update checkbox value
+  })  : _controller = controller,
+        _handleSubmitted = handleSubmitted,
+        _generateFlashcard = generateFlashcard,
+        _onGenerateFlashcardChanged = onGenerateFlashcardChanged;
 
   final TextEditingController _controller;
   final void Function(String) _handleSubmitted;
- 
-
-
+  final bool _generateFlashcard;
+  final void Function(bool?) _onGenerateFlashcardChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -133,22 +175,22 @@ class UserInputField extends StatelessWidget {
         Expanded(
           child: TextField(
             style: Theme.of(context).textTheme.labelMedium!.copyWith(height: 1.5),
-            
             controller: _controller,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color.fromARGB(255,21,21,20),
-              
-            
-              hintText: 'Enter your message here',
+              fillColor: const Color.fromARGB(255, 21, 21, 20),
+              hintText: 'Enter your message here (Enable checkbox to autogenerate summarized flashcards)',
               hintStyle: Theme.of(context).textTheme.labelMedium,
-              border: const OutlineInputBorder(borderRadius : BorderRadius.all(Radius.circular(12.0))),
+              border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
             ),
             keyboardType: TextInputType.multiline,
             maxLines: null, // Allows the input field to be scrollable
             onSubmitted: (text) => _handleSubmitted(text),
-            
           ),
+        ),
+        Checkbox(
+          value: _generateFlashcard,  // Checkbox value
+          onChanged: _onGenerateFlashcardChanged,  // Handle checkbox change
         ),
         IconButton(
           icon: const Icon(Icons.send),

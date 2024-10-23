@@ -21,96 +21,100 @@ class _CreateFlashCardState extends State<CreateFlashCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
-        child: Column(
-          
-          children: [
-            Container(decoration: const BoxDecoration(color: Color.fromARGB(255, 21, 21, 21)),
-            
-              child: Center(
-                      
-                      child: Padding(
-                        padding: const EdgeInsets.all(0.0),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left:256,right:256, bottom: 256),
-                          child: Column(
-                            children: [ const Text("Enter Flashcard Details Here", selectionColor: Color.fromARGB(255, 255, 255, 255), style: TextStyle(color:  Color.fromARGB(255,255,255,255), fontSize: 48, fontFamily: 'Raleway', fontWeight: FontWeight.w300),),
-                            const SizedBox(height: 56 ),
-                              Form(
-                               
-                                child: Column(
-                                  children: [
-                                    RoundedTextFormField(
-                                      obscureText: false,
-                                      controller: _titleController,
-                                      labelText: 'Title',
-                                      hintText: 'Enter flashcard title here',
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter a title';
-                                        }
-                                        return null;
-                                      },
-                                    ),
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              
+              children: [
+                Container(decoration: const BoxDecoration(color: Color.fromARGB(255, 21, 21, 21)),
                 
-                
-                                    const SizedBox(height: 40),
-                                    RoundedTextFormField(
-                                      obscureText: false,
-                                      controller: _topicController,
-                                      labelText: 'Topic',
-                                      hintText: 'Enter flashcard topic here',
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter flashcard topic';
-                                        }
-                                        return null;
-                                      },
-                
-                
-                                    ),
-
-
-                                    const SizedBox(height: 40),
-                                    RoundedTextFormField(
-                                      obscureText: false,
-                                      controller: _textController,
-                                      labelText: 'Text',
-                                      hintText: 'Enter flashcard text here',
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter flashcard text';
-                                        }
-                                        return null;
-                                      },
-                
-                
-                                    ),
+                  child: Center(
+                          
+                          child: Padding(
+                            padding: const EdgeInsets.all(0.0),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left:256,right:256, bottom: 256),
+                              child: Column(
+                                children: [ const Text("Enter Flashcard Details Here", selectionColor: Color.fromARGB(255, 255, 255, 255), style: TextStyle(color:  Color.fromARGB(255,255,255,255), fontSize: 48, fontFamily: 'Raleway', fontWeight: FontWeight.w300),),
+                                const SizedBox(height: 56 ),
+                                  Form(
                                    
-                                   
-                                    const SizedBox(height: 40),
-                                     ElevatedButton(
-                                      onPressed: () => createFlashcard(_topicController.text, _titleController.text, _textController.text),
-                                      style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
-                                      child: Text('Submit',style: Theme.of(context).textTheme.bodyMedium,),
+                                    child: Column(
+                                      children: [
+                                        RoundedTextFormField(
+                                          obscureText: false,
+                                          controller: _titleController,
+                                          labelText: 'Title',
+                                          hintText: 'Enter flashcard title here',
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Please enter a title';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                    
+                    
+                                        const SizedBox(height: 40),
+                                        RoundedTextFormField(
+                                          obscureText: false,
+                                          controller: _topicController,
+                                          labelText: 'Topic',
+                                          hintText: 'Enter flashcard topic here',
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Please enter flashcard topic';
+                                            }
+                                            return null;
+                                          },
+                    
+                    
+                                        ),
+        
+        
+                                        const SizedBox(height: 40),
+                                        RoundedTextFormField(
+                                          obscureText: false,
+                                          controller: _textController,
+                                          labelText: 'Text',
+                                          hintText: 'Enter flashcard text here',
+                                          validator: (value) {
+                                            if (value == null || value.isEmpty) {
+                                              return 'Please enter flashcard text';
+                                            }
+                                            return null;
+                                          },
+                    
+                    
+                                        ),
+                                       
+                                       
+                                        const SizedBox(height: 40),
+                                         ElevatedButton(
+                                          onPressed: () => createFlashcard(_topicController.text, _titleController.text, _textController.text),
+                                          style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
+                                          child: Text('Submit',style: Theme.of(context).textTheme.bodyMedium,),
+                                        ),
+                    
+                                        
+                                      ],
                                     ),
-                
-                                    
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-            ),
+                ),
+                  
               
-          
-          ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }

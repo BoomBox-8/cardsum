@@ -98,7 +98,7 @@ print("Correct answer: '$correctAnswer' (length: ${correctAnswer.length})");
 
 
   setState(() {
-    _isCorrect[questionIndex] = (userAnswer == correctAnswer); // evil hak
+    _isCorrect[questionIndex] = (userAnswer.substring(0,4) == correctAnswer.substring(0,4)); // evil hak
     });
 }
 

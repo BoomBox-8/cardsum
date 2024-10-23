@@ -78,10 +78,10 @@ def plaintext_summarizer(text):
 
         if text is None:
             return
-        #raw_text = raw_docx
+      
         docx = nlp(text)
         stopwords = list(STOP_WORDS)
-        # Build Word Frequency # word.text is tokenization in spacy
+        
         word_frequencies = {}  
         for word in docx:  
             if word.text not in stopwords:
@@ -95,10 +95,10 @@ def plaintext_summarizer(text):
 
         for word in word_frequencies.keys():  
             word_frequencies[word] = (word_frequencies[word]/maximum_frequncy)
-        # Sentence Tokens
+   
         sentence_list = [ sentence for sentence in docx.sents ]
 
-        # Sentence Scores
+
         sentence_scores = {}  
         for sent in sentence_list:  
             for word in sent:
@@ -119,6 +119,11 @@ def plaintext_summarizer(text):
 
 
         return f'{summary}\n'
+
+
+
+
+
 
 
 
@@ -188,59 +193,48 @@ class summarizerContainer():
             #self.questionsDict[question_text]=option[0]
         
     def generate_flashcards(self, text, num_flashcards=5):
-        """
-        Reads text from a file, sends it to OpenAI, and generates multiple flashcards
-        each with a title, topic, and content summary.
-        """
+ 
         if text is None:
-            return
+            return {}
 
-        
         completion = self.clientObj.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"""You will be provided with a large text. Generate content enough for multiple flashcards. Each content should provide title, topic and text summary
+                {"role": "system", "content": f"""You will be provided with a large text. Generate exactly {num_flashcards} flashcards. Each card should provide a topic and a content summary.The topic can be any keyword from the text and the summary should briefly explain the topic.
 
-Generate multiple such cards. Use only plain text throughout. Separate them everything using double newlines"""},
+    Use only plain text throughout. Separate the topic and summary with a newline."""},
                 {"role": "user", "content": text},
             ]
         )
 
-        escapeCounter = 0
-        flashcards = completion.choices[0].message.content.split("---")
+        flashcards = completion.choices[0].message.content.split("\n\n")
+        
+        flashcards_dict = {}
+        for card in flashcards:
+            lines = card.strip().split("\n")
+            if len(lines) >= 2:
+                topic = lines[0].strip()
+                summary = lines[1].strip()
+                flashcards_dict[topic] = summary
 
-        while (len(flashcards) < 3):
-            completion = self.clientObj.chat.completions.create(
+        return flashcards_dict
+    
+
+    def generate_simple_summary(self, text):
+        if text is None:
+            return {}
+
+        completion = self.clientObj.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": f"""You will be provided with a large text. Generate content enough for multiple flashcards. Each content should provide title, topic and text summary
-
-Generate multiple such cards. Use only plain text throughout. Separate them everything using double newlines"""},
+                {"role": "system", "content": f"""You will be provided with a large text. Provide a simple summary that a 10 year old child can understand. Use analogies simple language."""},
                 {"role": "user", "content": text},
             ]
         )
-            escapeCounter += 1
-            if escapeCounter > 5:
-                break #stupid measure to jump out early so it doesnt eat credits
-            
-            #some stupid heuristic to force this thing to keep giving it the output I want
-        flashcards = [i.strip() for i in flashcards] #remove any annoying white-space
+
+        return completion.choices[0].message.content
 
 
-        print(flashcards)
-        print("HERE IS THE RESPONSE FROM GPT FOR FLASHCARDS")
-
-
-        flashcards_list = []
-        for i in flashcards:
-            currentFlashList = i.split('\n\n')
-            flashcards_list.append([
-                ''.join(currentFlashList[1].split('Title: ')),
-                ''.join(currentFlashList[2].split('Topic: ')),
-                ''.join(currentFlashList[3].split('Content Summary: '))
-                                    ])
-
-        return (flashcards_list)
     
 
     

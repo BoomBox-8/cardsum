@@ -61,7 +61,7 @@ try
       "authToken" : token,
       'topic': topic,
       'title': title,
-      'text': text,
+      'content': text,
 
     }),
   );

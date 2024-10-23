@@ -13,7 +13,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
-  bool _generateFlashcard = false;  // Add this to _ChatScreenState
+  final bool _generateFlashcard = false;  // Add this to _ChatScreenState
 
 
 
@@ -21,26 +21,85 @@ class _ChatScreenState extends State<ChatScreen> {
   Future fetchData(String userBody) async {
     final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarize/'), body: userBody);
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON
+    
       return response.body;
     }
     
      else 
      {
-      // If the server did not return a 200 OK response, throw an exception.
+      
+      return 'Failed to load data. Try again';
+    }
+  }
+
+
+  Future fetchDataWithKeywords(String userBody) async {
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeSynonym/'), body: userBody);
+    if (response.statusCode == 200) {
+
+      return response.body;
+    }
+    
+     else 
+     {
+      
+      return 'Failed to load data. Try again';
+    }
+  }
+
+
+   Future fetchDataSimple(String userBody) async {
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/simpleSummary/'), body: userBody);
+    if (response.statusCode == 200) {
+
+      return response.body;
+    }
+    
+     else 
+     {
+      
       return 'Failed to load data. Try again';
     }
   }
 
 
 
-  void _handleSubmitted(String text) async {
-  print("skibid'");
+
+  void _handleSubmitted(String text, bool isGenerateCards, bool isGenerateKeywords, bool isSimple) async {
+
   
-  // Check if the checkbox is checked
   
-  
-  String result = await fetchData(text);
+  String result = '';
+  if (!isGenerateKeywords)
+  {
+    result = await fetchData(text);
+  }
+
+  else if (isGenerateKeywords)
+  {
+    result = await fetchDataWithKeywords(text);
+  }
+
+  if (isGenerateCards)
+  {
+    String token = PreferenceUtils.getString("authToken");
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeToFlashcards/'), headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', 
+        },
+        body: jsonEncode({
+          "authToken": token, 
+          "text": text,        
+          "result": result,    
+        }),);
+  }
+
+  if (isSimple)
+  {
+    result = await fetchDataSimple(text);
+  }
+
+
   if (text.isNotEmpty) {
     _controller.clear();
     setState(() {
@@ -48,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add("> $result");
     });
 
-
+  
     if (_generateFlashcard) {
       String token = PreferenceUtils.getString("authToken");
     
@@ -90,13 +149,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: UserInputField(controller: _controller, handleSubmitted: _handleSubmitted, generateFlashcard: _generateFlashcard,
-            onGenerateFlashcardChanged:(bool? value) {
-              setState(() {
-                //print("Skibid changed");
-                _generateFlashcard = value ?? false; 
-              });
-            } ,),
+            child: UserInputField(controller: _controller, handleSubmitted: _handleSubmitted
+             ,),
           ),
         ],
       ),
@@ -151,22 +205,42 @@ class TextBox extends StatelessWidget
 
 
 
-class UserInputField extends StatelessWidget {
+class UserInputField extends StatefulWidget {
   const UserInputField({
     super.key,
-    required TextEditingController controller,
-    required void Function(String) handleSubmitted,
-    required bool generateFlashcard,  
-    required void Function(bool?) onGenerateFlashcardChanged,  
-  })  : _controller = controller,
-        _handleSubmitted = handleSubmitted,
-        _generateFlashcard = generateFlashcard,
-        _onGenerateFlashcardChanged = onGenerateFlashcardChanged;
+    required this.controller,
+    required this.handleSubmitted,
+  });
 
-  final TextEditingController _controller;
-  final void Function(String) _handleSubmitted;
-  final bool _generateFlashcard;
-  final void Function(bool?) _onGenerateFlashcardChanged;
+  final TextEditingController controller;
+  final void Function(String, bool, bool, bool) handleSubmitted;
+
+  @override
+  _UserInputFieldState createState() => _UserInputFieldState();
+}
+
+class _UserInputFieldState extends State<UserInputField> {
+  bool _isCardSelected = false;
+  bool _isKeySelected = false;
+  bool _isChildSelected = false;
+
+  void _toggleCardIcon() {
+    setState(() {
+      _isCardSelected = !_isCardSelected;
+    });
+  }
+
+  void _toggleKeyIcon() {
+    setState(() {
+      _isKeySelected = !_isKeySelected;
+    });
+  }
+
+  void _toggleChildIcon() {
+    setState(() {
+      _isChildSelected = !_isChildSelected;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -175,28 +249,37 @@ class UserInputField extends StatelessWidget {
         Expanded(
           child: TextField(
             style: Theme.of(context).textTheme.labelMedium!.copyWith(height: 1.5),
-            controller: _controller,
+            controller: widget.controller,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color.fromARGB(255, 21, 21, 20),
-              hintText: 'Enter your message here (Enable checkbox to autogenerate summarized flashcards)',
+              hintText: 'Enter your message here',
               hintStyle: Theme.of(context).textTheme.labelMedium,
               border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
             ),
             keyboardType: TextInputType.multiline,
-            maxLines: null, 
-            onSubmitted: (text) => _handleSubmitted(text),
+            maxLines: null,
+            
           ),
         ),
-        Checkbox(
-          value: _generateFlashcard,  
-          onChanged: _onGenerateFlashcardChanged,  
+        IconButton(
+          icon: Icon(Icons.card_membership, color: _isCardSelected ? Colors.blue : Colors.grey),
+          onPressed: _toggleCardIcon,
+        ),
+        IconButton(
+          icon: Icon(Icons.vpn_key, color: _isKeySelected ? Colors.blue : Colors.grey),
+          onPressed: _toggleKeyIcon,
+        ),
+        IconButton(
+          icon: Icon(Icons.child_care, color: _isChildSelected ? Colors.blue : Colors.grey),
+          onPressed: _toggleChildIcon,
         ),
         IconButton(
           icon: const Icon(Icons.send),
-          onPressed: () => _handleSubmitted(_controller.text),
+          onPressed: () => widget.handleSubmitted(widget.controller.text, _isCardSelected, _isKeySelected, _isChildSelected),
         ),
       ],
     );
   }
 }
+

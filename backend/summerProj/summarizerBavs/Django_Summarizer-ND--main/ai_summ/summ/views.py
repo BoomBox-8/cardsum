@@ -5,15 +5,18 @@ from .models import Post, FlashcardsManager
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
-
 from django.views.decorators.csrf import csrf_exempt
+
 from ai_summ import summarizer
 from ai_summ import summarizerv2
+from ai_summ import keybertSynonymizer
+
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
 
 from django.middleware.csrf import get_token
 
@@ -42,29 +45,55 @@ def summarize(request):
     bodyText = request.body.decode('utf-8')
     return HttpResponse(summarizerv2.plaintext_summarizer(bodyText))
 
+
+@csrf_exempt
+def summarizeSynonym(request):
+    bodyText = request.body.decode('utf-8')
+    summarizedText = summarizerv2.plaintext_summarizer(bodyText)
+    keywordsString = "\n\n"
+    keywordsDict = keybertSynonymizer.extract_keywords(bodyText)
+
+    for i in keywordsDict:
+        keywordsString += f"Keyword: {i} | Synonyms: {','.join(keywordsDict[i])}\n\n"
+
+
+    return HttpResponse(summarizedText+keywordsString)
+
+
+
+@csrf_exempt
+def simpleSummary(request):
+    bodyText = request.body.decode('utf-8')
+    return HttpResponse(summarizerv2.summarizerContainer().generate_simple_summary(bodyText))
+
+
 @csrf_exempt
 def summarizeToFlashcards(request):
-    data = json.loads(request.body)
+    data = json.load(request)
+    print(data)
     summarizerContainerObj = summarizerv2.summarizerContainer()
-    flashcardsList = summarizerContainerObj.generate_flashcards(request.body.decode('utf-8'))
-    print(f"Here be flashcard amount: {len(flashcardsList)}")
-
+    flashcardsDict = summarizerContainerObj.generate_flashcards(data.get("text"))
+    
+    jsonSend = {}
     if request.method == "POST":
         
-        for i in flashcardsList:
+        for i in flashcardsDict:
             
             print(f"HERE BE FLASHCARD EACH {repr(i)}")
-            topic = i[2]
-            title = i[1]
-            text = i[3]
+    
+
+            flashcard_data = {
+                    'authToken': data.get('authToken'),
+                    'topic': i,
+                    'title': 'GenCard',
+                    'text': flashcardsDict[i]
+                }
+
+        
 
             
 
-            request.topic = topic
-            request.title = title
-            request.content = text
-
-            flashcard = FlashcardsManager.create_flashcard(request) 
+            flashcard = FlashcardsManager.create_flashcard_from_dict(flashcard_data) 
             flashcard.save() 
 
             #what in the spaghetti code

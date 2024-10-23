@@ -29,12 +29,29 @@ class FlashcardsManager():
 
         topic = data.get('topic')
         title = data.get('title')
-        text = data.get('content') #done so I don't mess with Django's WSGI objects potentially including text attr, saw this late
+        text = data.get('text') 
 
 
         flashcard = Flashcard(user = userObj, topic = topic, title = title, text = text)
         flashcard.save()
         return flashcard
+
+    @staticmethod
+    def create_flashcard_from_dict(data):  # Accept data dictionary directly
+        print(f"Data Body  here is : {data} ")
+
+        token = data.get('authToken')
+        userID = AccessToken(token)['user_id']
+        userObj = User.objects.get(id=userID)
+
+        topic = data.get('topic')
+        title = data.get('title')
+        text = data.get('text') 
+
+        flashcard = Flashcard(user=userObj, topic=topic, title=title, text=text)
+        flashcard.save()
+        return flashcard
+    
 
 
     @staticmethod

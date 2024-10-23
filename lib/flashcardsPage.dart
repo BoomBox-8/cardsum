@@ -105,7 +105,7 @@ class FlashcardFront extends StatelessWidget {
             
               Text(
                   title,
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255),  fontSize : 56,), textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255),  fontSize : 48,), textAlign: TextAlign.center,
                 ),]
               ),
           
@@ -207,7 +207,7 @@ class FlashcardBack extends StatelessWidget {
             
               Text(
                   title,
-                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255),  fontSize : 56,), textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(color: const Color.fromARGB(255, 221,219,255),  fontSize : 48,), textAlign: TextAlign.center,
                 ),]
               ),
           

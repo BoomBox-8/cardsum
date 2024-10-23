@@ -1,18 +1,12 @@
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:summer_proj_app/dbUtils.dart';
 import 'package:summer_proj_app/flashcard_screen_container.dart';
 import 'package:summer_proj_app/questionPage.dart';
-import 'flashcardsPage.dart';
 import 'summarizerPage.dart';
 import 'createFlashcardPage.dart';
 import 'viewCardsPage.dart';
-import 'questionPage.dart';
 
 
-import 'package:summer_proj_app/preferenceUtils.dart';
-import 'package:http/http.dart' as http;
 
 
 
@@ -36,10 +30,10 @@ class _toolPageState extends State<toolPage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page =  viewCardsPage();
+        page =  const viewCardsPage();
         break;
       case 1:
-        page =  FlashcardScreenContainer();
+        page =  const FlashcardScreenContainer();
         break;
       
       case 2:

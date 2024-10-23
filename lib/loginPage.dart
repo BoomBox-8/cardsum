@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:summer_proj_app/preferenceUtils.dart';
@@ -45,7 +44,7 @@ class _LoginFormState extends State<LoginForm> {
       //authenticate aachu bro
       final responseData = json.decode(response.body);
       PreferenceUtils.setString("authToken", responseData['accessToken']);
-
+      PreferenceUtils.setString("csrfToken", responseData['csrfToken']);
       print('Access Token: ${responseData['accessToken']}');
       print('Message: ${responseData['message']}');
       setState(() { _errorMessage = "Login Successful";}
@@ -67,7 +66,7 @@ class _LoginFormState extends State<LoginForm> {
     else 
     {
       print('Unexpected status code: ${response.statusCode}');
-      setState(() { _errorMessage = "You are on your own, pal";} //no place for komedi here, need to change this later
+      setState(() { _errorMessage = "Unexpected Error";} //no place for komedi here, need to change this later
         );
       return false;
       
@@ -148,7 +147,6 @@ class _LoginFormState extends State<LoginForm> {
       {
 
         //Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
-        ;
 
       }
 
@@ -171,7 +169,6 @@ class _LoginFormState extends State<LoginForm> {
         {
 
           //Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondPage()));
-          ;
 
       }
 
@@ -190,7 +187,7 @@ class _LoginFormState extends State<LoginForm> {
         child: Column(
           
           children: [
-            Container(decoration: BoxDecoration(
+            Container(decoration: const BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/images/signInBG.png"),
               fit: BoxFit.cover,)),
@@ -320,10 +317,10 @@ class RoundedTextFormField extends StatelessWidget {
         decoration: InputDecoration(
           border: InputBorder.none,
           labelText: labelText,
-          labelStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: Color.fromARGB(255, 111, 111, 111)),
+          labelStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 111, 111, 111)),
 
           hintText: hintText,
-          hintStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: Color.fromARGB(255, 111, 111, 111)),
+          hintStyle: Theme.of(context).textTheme.labelMedium!.copyWith(color: const Color.fromARGB(255, 111, 111, 111)),
           
           errorStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.red)
         ),

@@ -8,9 +8,9 @@ import 'loginPage.dart';
 
 
 class FlashcardScreenContainer extends StatefulWidget {
-  FlashcardScreenContainer({
-    Key? key,
-  }) : super(key: key);
+  const FlashcardScreenContainer({
+    super.key,
+  });
 
   @override
   State<FlashcardScreenContainer> createState() => _FlashcardScreenContainerState();
@@ -67,7 +67,7 @@ class FlashcardContent extends StatefulWidget {
   final void Function(int) updateIndex;
 
 
-  FlashcardContent({
+  const FlashcardContent({super.key, 
     required this.fetchFlashcard,
     required this.updateIndex,
 
@@ -93,20 +93,20 @@ class _FlashcardContentState extends State<FlashcardContent> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Color.fromARGB(255, 21, 21, 21),
+          backgroundColor: const Color.fromARGB(255, 21, 21, 21),
           title: Text('Edit Flashcard', style: Theme.of(context).textTheme.bodyMedium),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 RoundedTextFormField(controller: topicController, labelText: 'Topic', hintText: "Enter Your Topic Here", obscureText: false,),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
                 RoundedTextFormField(controller: titleController, labelText: 'Title', hintText: "Enter Your Title Here", obscureText: false,),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
 
                 RoundedTextFormField(controller: textController, labelText: 'Text', hintText: "Enter Your Text Here", obscureText: false,),
-                SizedBox(height: 30),
+                const SizedBox(height: 30),
                
               ],
             ),

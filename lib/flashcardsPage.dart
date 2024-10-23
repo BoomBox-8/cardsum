@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dbUtils.dart';
 
 
 
@@ -12,12 +11,12 @@ class FlashcardScreen extends StatefulWidget {
 
   // Updated constructor with additional parameters
    FlashcardScreen({
-    Key? key,
+    super.key,
     required this.title,
     required this.topic,
     required this.text,
     required this.flashID,
-  }) : super(key: key);
+  });
         
 
 
@@ -48,8 +47,8 @@ class _FlashcardScreenState extends State<FlashcardScreen> {
             },
 
             child: _isFront
-                ? FlashcardFront(key: ValueKey(1), title: widget.title, topic: widget.topic)
-                : FlashcardBack(key: ValueKey(2), title: widget.title, topic: widget.topic, text: widget.text,),
+                ? FlashcardFront(key: const ValueKey(1), title: widget.title, topic: widget.topic)
+                : FlashcardBack(key: const ValueKey(2), title: widget.title, topic: widget.topic, text: widget.text,),
 
           ),
         ),
@@ -65,10 +64,10 @@ class FlashcardFront extends StatelessWidget {
 
 
   const FlashcardFront({
-    Key? key,
+    super.key,
     required this.title,
     required this.topic,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,11 +165,11 @@ class FlashcardBack extends StatelessWidget {
 
 
   const FlashcardBack({
-    Key? key,
+    super.key,
     required this.title,
     required this.topic,
     required this.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

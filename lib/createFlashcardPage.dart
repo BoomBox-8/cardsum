@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'loginPage.dart';
 import 'dbUtils.dart';
 
@@ -27,7 +26,7 @@ class _CreateFlashCardState extends State<CreateFlashCard> {
         child: Column(
           
           children: [
-            Container(decoration: BoxDecoration(color: Color.fromARGB(255, 21, 21, 21)),
+            Container(decoration: const BoxDecoration(color: Color.fromARGB(255, 21, 21, 21)),
             
               child: Center(
                       

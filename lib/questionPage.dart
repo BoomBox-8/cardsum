@@ -93,17 +93,13 @@ class _MCQPageState extends State<MCQPage> {
   final correctAnswer = _questions[questionIndex]['correctAnswer'].trim();
   final userAnswer = _selectedAnswers[questionIndex]!.trim();
 
-  print("User answer: '$userAnswer' (length: ${userAnswer?.length})");
+  print("User answer: '$userAnswer' (length: ${userAnswer.length})");
 print("Correct answer: '$correctAnswer' (length: ${correctAnswer.length})");
 
 
   setState(() {
-    if (userAnswer == null) {
-      _isCorrect[questionIndex] = null; // No answer selected case because ofc
-    } else {
-      _isCorrect[questionIndex] = (userAnswer == correctAnswer); // evil hak
-    }
-  });
+    _isCorrect[questionIndex] = (userAnswer == correctAnswer); // evil hak
+    });
 }
 
 

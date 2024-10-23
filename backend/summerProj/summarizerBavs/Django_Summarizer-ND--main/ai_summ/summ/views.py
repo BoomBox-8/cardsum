@@ -13,12 +13,15 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.decorators import api_view
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+from django.middleware.csrf import get_token
 
 #stupid stuff, should really import over models?
 #only damn reason I have these is for the tokens
 #maybe sessions would have been a better idea?
 
-# Create your views here.
+
 
 def home(request):
     context = {
@@ -84,6 +87,7 @@ def questionGenerate(request):
 
 @csrf_exempt
 def login(request):
+    
 
     if request.method == "POST":
         data = json.loads(request.body)
@@ -104,11 +108,34 @@ def login(request):
         else:
 
             refresh = RefreshToken.for_user(user)
+            csrf_token = get_token(request)
 
-            return JsonResponse({"accessToken" : str(refresh.access_token), "message" : "Authenticated Successfully"},  status = 200)
+            return JsonResponse({"accessToken" : str(refresh.access_token), "message" : "Authenticated Successfully", "csrfToken" : csrf_token},  status = 200)
      
 
- 
+@csrf_exempt
+def logout(request):
+    print(f"Logout request received: {request.method}")
+    
+    if request.method == "POST":
+        try:
+            auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+            print(f"Authorization Header: {auth_header}")  # Log the header
+
+            if not auth_header or not auth_header.startswith("Bearer "):
+                return JsonResponse({"error": "Invalid token"}, status=400)
+
+            token = auth_header.split(" ")[1]
+            jwt_auth = JWTAuthentication()
+            validated_token = jwt_auth.get_validated_token(token)  # Validate the token
+            
+            # Blacklist the token
+            BlacklistedToken.objects.create(token=validated_token)
+
+            return JsonResponse({"message": "Logged out successfully"}, status=205)  # No content to send back
+        except Exception as e:
+            print(f"Error during logout: {str(e)}")  # Log the exception
+            return JsonResponse({"error": str(e)}, status=400)
 
 @csrf_exempt
 def registerUser(request):
@@ -130,20 +157,33 @@ def registerUser(request):
 @api_view(['POST'])
 @csrf_exempt
 def getUserInfo(request):
-    # The user is authenticated, so you can access the user instance directly
-    data = json.loads(request.body)
-    print(data)
-    token = data.get('authToken')
-    print(token)
 
-    # Retrieve the username from the user object
-    userID = AccessToken(token)['user_id']
-    user = User.objects.get(id = userID)
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    token = data.get('authToken')
+    
+    if not token:
+        return JsonResponse({"error": "Token not provided"}, status=400)
+
+    try:
+
+        userID = AccessToken(token)['user_id']
+    except Exception as e:
+
+        return JsonResponse({"error": "Invalid or expired token"}, status=401)
+
+    try:
+
+        user = User.objects.get(id=userID)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "User not found"}, status=404)
 
     username = user.username
-    print(username)
-
     return JsonResponse({'username': username}, status=200)
+
 
 @api_view(['POST'])
 @csrf_exempt

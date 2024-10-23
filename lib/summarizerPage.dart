@@ -54,25 +54,25 @@ class _ChatScreenState extends State<ChatScreen> {
     
     final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeToFlashcards/'), headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',  // Include the auth token here
+          'Authorization': 'Bearer $token', 
         },
         body: jsonEncode({
-          "authToken": token,  // You can include the token in the body if needed
-          "text": text,        // Send the original user text
-          "result": result,    // The summarized result you already fetched
+          "authToken": token, 
+          "text": text,        
+          "result": result,    
         }),);
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON
+      
        print(response.body);
     }
     
      else 
      {
-      // If the server did not return a 200 OK response, throw an exception.
+      
        print('Failed to load data. Try again');
     }
     
-    return; // Do nothing else
+    return; 
   }
   }
 }
@@ -94,7 +94,7 @@ class _ChatScreenState extends State<ChatScreen> {
             onGenerateFlashcardChanged:(bool? value) {
               setState(() {
                 //print("Skibid changed");
-                _generateFlashcard = value ?? false;  // Update checkbox value
+                _generateFlashcard = value ?? false; 
               });
             } ,),
           ),
@@ -156,8 +156,8 @@ class UserInputField extends StatelessWidget {
     super.key,
     required TextEditingController controller,
     required void Function(String) handleSubmitted,
-    required bool generateFlashcard,  // Pass the checkbox value
-    required void Function(bool?) onGenerateFlashcardChanged,  // Pass a function to update checkbox value
+    required bool generateFlashcard,  
+    required void Function(bool?) onGenerateFlashcardChanged,  
   })  : _controller = controller,
         _handleSubmitted = handleSubmitted,
         _generateFlashcard = generateFlashcard,
@@ -184,13 +184,13 @@ class UserInputField extends StatelessWidget {
               border: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
             ),
             keyboardType: TextInputType.multiline,
-            maxLines: null, // Allows the input field to be scrollable
+            maxLines: null, 
             onSubmitted: (text) => _handleSubmitted(text),
           ),
         ),
         Checkbox(
-          value: _generateFlashcard,  // Checkbox value
-          onChanged: _onGenerateFlashcardChanged,  // Handle checkbox change
+          value: _generateFlashcard,  
+          onChanged: _onGenerateFlashcardChanged,  
         ),
         IconButton(
           icon: const Icon(Icons.send),

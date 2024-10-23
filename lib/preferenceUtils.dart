@@ -22,5 +22,9 @@ class PreferenceUtils {
   static Future<bool> setString(String key, String value) async {
     return _instance.setString(key, value);
   }
+
+  static Future<bool> deleteString(String key) async {
+    return _instance.remove(key);
+  }
 }
 

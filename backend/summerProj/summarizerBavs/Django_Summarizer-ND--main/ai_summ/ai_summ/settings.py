@@ -35,6 +35,7 @@ APPEND_SLASH = False #evil
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'summ.apps.SummConfig',
     'users.apps.UsersConfig',
@@ -92,6 +93,11 @@ DATABASES = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
+CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_HTTPONLY = False
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:65162',
+]
 
 
 # Password validation

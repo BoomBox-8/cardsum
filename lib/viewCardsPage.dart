@@ -6,6 +6,8 @@ import 'flashcardsPage.dart';
 
 
 class viewCardsPage extends StatefulWidget {
+  const viewCardsPage({super.key});
+
   @override
   _FlashcardScreenState createState() => _FlashcardScreenState();
 }
@@ -54,7 +56,7 @@ class _FlashcardScreenState extends State<viewCardsPage> {
 
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
 
 
 
@@ -65,14 +67,14 @@ class _FlashcardScreenState extends State<viewCardsPage> {
           } 
           
           else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No flashcards found'));
+            return const Center(child: Text('No flashcards found'));
           }
           
           
            else {
             final flashcards = snapshot.data!;
             return GridView.builder(
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
       crossAxisCount: 2, // Number of items per row
       crossAxisSpacing: 1.0, // Space between items in a row
       mainAxisSpacing: 1.0, // Space between rows

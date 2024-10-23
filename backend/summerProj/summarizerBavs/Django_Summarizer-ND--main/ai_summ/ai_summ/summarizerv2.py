@@ -195,7 +195,7 @@ class summarizerContainer():
         if text is None:
             return
 
-        # Send a request to OpenAI for multiple flashcards
+        
         completion = self.clientObj.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[

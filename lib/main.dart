@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
 import 'package:summer_proj_app/preferenceUtils.dart';
 //this little fella makes sure JWT tokens are safely tucked away! local storage too!
-import 'dart:convert';
 
-import 'loginPage.dart';
 
 import 'homepage.dart';
-import 'toolPage.dart';
 
 
 
 void main() async
 {
-  WidgetsFlutterBinding.ensureInitialized(); // Ensure Flutter is initialized
-  await PreferenceUtils.init(); // Initialize PreferenceUtils
+  WidgetsFlutterBinding.ensureInitialized(); 
+  await PreferenceUtils.init(); // Initialize PreferenceUtils for ze psuedo cookie storage
 
   runApp(const MyApp());
 }

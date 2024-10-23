@@ -15,8 +15,8 @@ class SecondPage extends StatefulWidget {
 
 class _SecondPageState extends State<SecondPage> {
 
-  int _tabIndex = 0; //this lil guy helps us swap pages!!
-  Widget displayedPage = homePageWidget(); //nice default lad
+  final int _tabIndex = 0; //this lil guy helps us swap pages!!
+  Widget displayedPage = const homePageWidget(); //nice default lad
 
 
   void _swapWidgetCallback(int index)
@@ -26,19 +26,24 @@ class _SecondPageState extends State<SecondPage> {
       switch (index)
       {
         case 0:
-          displayedPage = LoginForm();
+          displayedPage = const LoginForm();
           break;
         
         case 1:
-          displayedPage = toolPage();
+          displayedPage = const toolPage();
           break;
 
         case 2:
-          displayedPage = LoginForm();
+          String authToken = PreferenceUtils.getString("authToken");
+          
+
+          String csrfToken = PreferenceUtils.getString("csrfToken");
+          logout(authToken, csrfToken);
+          displayedPage = const LoginForm();
           break;
 
         case 3:
-          displayedPage = homePageWidget();
+          displayedPage = const homePageWidget();
           break;
       }
     });
@@ -46,7 +51,7 @@ class _SecondPageState extends State<SecondPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Color.fromARGB(255, 21, 21, 21),
+    return Scaffold(backgroundColor: const Color.fromARGB(255, 21, 21, 21),
     
       body: Align(
         alignment: Alignment.topCenter,
@@ -77,7 +82,7 @@ class homePageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: SingleChildScrollView(child: scrollableHome()));
+    return const Expanded(child: SingleChildScrollView(child: scrollableHome()));
   }
 }
 
@@ -173,8 +178,8 @@ class homePageNavBar extends StatefulWidget {
 
   const homePageNavBar(
     this.tabCallback,
-    {Key? key}
-  ) : super(key:key);
+    {super.key}
+  );
 
   @override
   State<homePageNavBar> createState() => _homePageNavBarState();
@@ -211,7 +216,7 @@ class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStat
           child: Row(
             children: [
               Text("CardSum", style: Theme.of(context).textTheme.bodyMedium),
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               FutureBuilder<String>(
           future: getUsername(),
           builder: (context, snapshot)
@@ -227,7 +232,7 @@ class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStat
             
              else if (snapshot.hasData) 
              {
-              return Text(("Current User: " + snapshot.data!), style: Theme.of(context).textTheme.labelMedium);  
+              return Text(("Current User: ${snapshot.data!}"), style: Theme.of(context).textTheme.labelMedium);  
             } 
             
             else {
@@ -240,7 +245,7 @@ class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStat
           ),
         )),
 
-        SizedBox(width: 200,),
+        const SizedBox(width: 200,),
 
 
           Expanded(flex: 1,
@@ -258,7 +263,7 @@ class _homePageNavBarState extends State<homePageNavBar> with TickerProviderStat
                 isScrollable: true,
                   
 
-                tabs: <Widget>[
+                tabs: const <Widget>[
                     Tab(child: Text("Login/Register", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
                     Tab(child: Text("Toolkit Page", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),
                     Tab(child: Text("Logout", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, fontFamily: 'Raleway'))),

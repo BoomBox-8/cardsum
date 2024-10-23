@@ -14,5 +14,6 @@ urlpatterns = [
     path('deleteFlashcard/', views.deleteFlashcard, name='summ-deleteFlashcard'),
     path('updateFlashcard/', views.updateFlashcard, name='summ-updateFlashcard'),
     path('summarizeToFlashcards/', views.summarizeToFlashcards, name = 'summ-summarizeToFlashcards'),
-    path('questionGenerate/', views.questionGenerate, name = 'summ-questionGenerate')
+    path('questionGenerate/', views.questionGenerate, name = 'summ-questionGenerate'),
+    path('logout/', views.logout, name = 'summ-logout')
 ]

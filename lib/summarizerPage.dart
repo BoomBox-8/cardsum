@@ -13,13 +13,19 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final List<String> _messages = [];
-  final bool _generateFlashcard = false;  // Add this to _ChatScreenState
+  // Add this to _ChatScreenState
 
 
 
 
-  Future fetchData(String userBody) async {
-    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarize/'), body: userBody);
+  Future fetchData(String userBody, String language) async {
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarize/'), body:  jsonEncode({
+      'userBody' : userBody,
+      'language' : language
+
+    }),);
+
+    
     if (response.statusCode == 200) {
     
       return response.body;
@@ -33,8 +39,12 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
 
-  Future fetchDataWithKeywords(String userBody) async {
-    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeSynonym/'), body: userBody);
+  Future fetchDataWithKeywords(String userBody, String language) async {
+    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeSynonym/'), body:  jsonEncode({
+      'userBody' : userBody,
+      'language' : language
+
+    }));
     if (response.statusCode == 200) {
 
       return response.body;
@@ -65,19 +75,19 @@ class _ChatScreenState extends State<ChatScreen> {
 
 
 
-  void _handleSubmitted(String text, bool isGenerateCards, bool isGenerateKeywords, bool isSimple) async {
+  void _handleSubmitted(String text, bool isGenerateCards, bool isGenerateKeywords, bool isSimple, String language) async {
 
   
   
   String result = '';
   if (!isGenerateKeywords)
   {
-    result = await fetchData(text);
+    result = await fetchData(text, language);
   }
 
   else if (isGenerateKeywords)
   {
-    result = await fetchDataWithKeywords(text);
+    result = await fetchDataWithKeywords(text, language);
   }
 
   if (isGenerateCards)
@@ -108,31 +118,6 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
   
-    if (_generateFlashcard) {
-      String token = PreferenceUtils.getString("authToken");
-    
-    final response = await http.post(Uri.parse('http://127.0.0.1:8000/summarizeToFlashcards/'), headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', 
-        },
-        body: jsonEncode({
-          "authToken": token, 
-          "text": text,        
-          "result": result,    
-        }),);
-    if (response.statusCode == 200) {
-      
-       print(response.body);
-    }
-    
-     else 
-     {
-      
-       print('Failed to load data. Try again');
-    }
-    
-    return; 
-  }
   }
 }
 
@@ -193,7 +178,7 @@ class TextBox extends StatelessWidget
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.only(left: 32, top: 16),
-                      child: (index % 2 == 0)  ?  SelectableText("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : Text( _messages[index] ,),
+                      child: (index % 2 == 0)  ?  SelectableText("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : SelectableText( _messages[index] ,),
                     );
                   },
                 ),
@@ -213,7 +198,7 @@ class UserInputField extends StatefulWidget {
   });
 
   final TextEditingController controller;
-  final void Function(String, bool, bool, bool) handleSubmitted;
+  final void Function(String, bool, bool, bool, String) handleSubmitted;
 
   @override
   _UserInputFieldState createState() => _UserInputFieldState();
@@ -223,6 +208,7 @@ class _UserInputFieldState extends State<UserInputField> {
   bool _isCardSelected = false;
   bool _isKeySelected = false;
   bool _isChildSelected = false;
+  String _selectedLanguage = "English";  // Default selected language
 
   void _toggleCardIcon() {
     setState(() {
@@ -246,6 +232,40 @@ class _UserInputFieldState extends State<UserInputField> {
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
+        // Dropdown for language selection
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 21, 21, 20),
+            borderRadius: BorderRadius.circular(12.0),  
+            border: Border.all(color: Colors.grey),  
+          ),
+          child: DropdownButton<String>(
+            value: _selectedLanguage,
+            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+            underline: Container(),  //wipe ze underline
+            dropdownColor: const Color.fromARGB(255, 21, 21, 20),
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.white),
+
+            items: <String>['English', 'French', 'Spanish', 'Auto-Detect'].map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+
+
+
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedLanguage = newValue!;
+              });
+            },
+          ),
+        ),
+        const SizedBox(width: 8),  // Space between dropdown and text field
+
+        // Input text field
         Expanded(
           child: TextField(
             style: Theme.of(context).textTheme.labelMedium!.copyWith(height: 1.5),
@@ -259,9 +279,10 @@ class _UserInputFieldState extends State<UserInputField> {
             ),
             keyboardType: TextInputType.multiline,
             maxLines: null,
-            
           ),
         ),
+        
+        // Icons for toggling
         IconButton(
           icon: Icon(Icons.card_membership, color: _isCardSelected ? Colors.blue : Colors.grey),
           onPressed: _toggleCardIcon,
@@ -274,12 +295,13 @@ class _UserInputFieldState extends State<UserInputField> {
           icon: Icon(Icons.child_care, color: _isChildSelected ? Colors.blue : Colors.grey),
           onPressed: _toggleChildIcon,
         ),
+        
+        // Send button
         IconButton(
           icon: const Icon(Icons.send),
-          onPressed: () => widget.handleSubmitted(widget.controller.text, _isCardSelected, _isKeySelected, _isChildSelected),
+          onPressed: () => widget.handleSubmitted(widget.controller.text, _isCardSelected, _isKeySelected, _isChildSelected, _selectedLanguage),
         ),
       ],
     );
   }
 }
-

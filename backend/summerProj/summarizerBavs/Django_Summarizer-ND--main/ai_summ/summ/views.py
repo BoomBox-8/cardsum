@@ -11,6 +11,7 @@ from ai_summ import summarizer
 from ai_summ import summarizerv2
 from ai_summ import keybertSynonymizer
 
+import os
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework.decorators import api_view
@@ -42,16 +43,19 @@ def about(request):
 
 @csrf_exempt
 def summarize(request):
-    bodyText = request.body.decode('utf-8')
-    return HttpResponse(summarizerv2.plaintext_summarizer(bodyText))
+    data = json.load(request)
+    return HttpResponse(summarizerv2.text_summarizer(data.get("userBody"), data.get("language")))
 
 
 @csrf_exempt
 def summarizeSynonym(request):
-    bodyText = request.body.decode('utf-8')
-    summarizedText = summarizerv2.plaintext_summarizer(bodyText)
+    
+    data = json.loads(request.body)
+    print(data.get("language"))
+    userBody = data.get("userBody")
+    summarizedText = summarizerv2.text_summarizer(userBody, data.get("language"))
     keywordsString = "\n\n"
-    keywordsDict = keybertSynonymizer.extract_keywords(bodyText)
+    keywordsDict = keybertSynonymizer.extract_keywords(userBody)
 
     for i in keywordsDict:
         keywordsString += f"Keyword: {i} | Synonyms: {','.join(keywordsDict[i])}\n\n"
@@ -69,7 +73,7 @@ def simpleSummary(request):
 
 @csrf_exempt
 def summarizeToFlashcards(request):
-    data = json.load(request)
+    data = json.loads(request.body)
     print(data)
     summarizerContainerObj = summarizerv2.summarizerContainer()
     flashcardsDict = summarizerContainerObj.generate_flashcards(data.get("text"))
@@ -79,7 +83,7 @@ def summarizeToFlashcards(request):
         
         for i in flashcardsDict:
             
-            print(f"HERE BE FLASHCARD EACH {repr(i)}")
+            #print(f"HERE BE FLASHCARD EACH {repr(i)}")
     
 
             flashcard_data = {

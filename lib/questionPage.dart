@@ -14,9 +14,9 @@ class _MCQPageState extends State<MCQPage> {
   final List<String?> _selectedAnswers = [];
   final List<bool?> _isCorrect = [];
   final TextEditingController _topicController = TextEditingController();
+  int _correctAnswersCount = 0;  
 
   void _generateQuestions(String topic) async {
-   
     print("Inside q generator");
     final response = await http.post(
       Uri.parse('http://127.0.0.1:8000/questionGenerate/'),
@@ -29,79 +29,52 @@ class _MCQPageState extends State<MCQPage> {
     );
 
     if (response.statusCode == 200) {
-
       final jsonData = jsonDecode(response.body);
       print(jsonData);
 
- 
       Map<String, dynamic> questionsFromApi = jsonData['questions'];
     
       print("before setState");
- 
-        setState(() {
-      _questions.clear();
-      _selectedAnswers.clear();
-      _isCorrect.clear();
+      setState(() {
+        _questions.clear();
+        _selectedAnswers.clear();
+        _isCorrect.clear();
+        _correctAnswersCount = 0; 
 
-      String correctAnswer;
-      List<String> choices;
+        questionsFromApi.forEach((question, answersMap) {
+          answersMap.forEach((choiceKey, correctAnswerValue) {
+            final choices = choiceKey.split('\n')..removeAt(0); 
 
+            _questions.add({
+              'question': question,  
+              'choices': choices,    
+              'correctAnswer': correctAnswerValue, 
+            });
 
-      questionsFromApi.forEach((question, answersMap) {
-        print("Processing question: $question");
-        
-       
-
- 
-        print("Answer Map is ${answersMap.runtimeType}");
-        
-        
-
-      answersMap.forEach((choiceKey, correctAnswerValue) {
- 
-  choices = choiceKey.split('\n');
-  choices.removeAt(0); //stupid bug
-
-
-  correctAnswer = correctAnswerValue; 
-
-  _questions.add({
-    'question': question,  // The actual question
-    'choices': choices,    
-    'correctAnswer': correctAnswerValue, // The correct answer
-  });
-
-  // Initialize for user selection and correctness check
-  _selectedAnswers.add(null); 
-  _isCorrect.add(null);
-});
-
-        //print("Details are $choices, $question, $correctAnswer");
-        // Initialize user selections and correctness states
-        _selectedAnswers.add(null);
-        _isCorrect.add(null);
+   
+            _selectedAnswers.add(null); 
+            _isCorrect.add(null);
+          });
+        });
       });
-    });
-
     } else {
-      // Handle any errors from the server
       print("Error: Failed to generate questions. Status Code: ${response.statusCode}");
     }
   }
 
   void _submitAnswer(int questionIndex) {
-  final correctAnswer = _questions[questionIndex]['correctAnswer'].trim();
-  final userAnswer = _selectedAnswers[questionIndex]!.trim();
+    final correctAnswer = _questions[questionIndex]['correctAnswer'].trim();
+    final userAnswer = _selectedAnswers[questionIndex]!.trim();
 
-  print("User answer: '$userAnswer' (length: ${userAnswer.length})");
-print("Correct answer: '$correctAnswer' (length: ${correctAnswer.length})");
-
-
-  setState(() {
-    _isCorrect[questionIndex] = (userAnswer.substring(0,4) == correctAnswer.substring(0,4)); // evil hak
+    setState(() {
+      _isCorrect[questionIndex] = (userAnswer.substring(0, 4) == correctAnswer.substring(0, 4));  // Evil hack
+      
+  
+      if (_isCorrect[questionIndex] == true) {
+        _correctAnswersCount++;
+      }
     });
-}
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -224,6 +197,17 @@ print("Correct answer: '$correctAnswer' (length: ${correctAnswer.length})");
                         );
                       },
                     ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Number of correct answers: $_correctAnswersCount / ${_questions.length}',
+              style: Theme.of(context)
+                  .textTheme
+                  .labelMedium!
+                  .copyWith(
+                    color: const Color.fromARGB(255, 221, 219, 255),
+                    fontSize: 18,
+                  ),
             ),
           ],
         ),

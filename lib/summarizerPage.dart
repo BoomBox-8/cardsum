@@ -113,8 +113,8 @@ class _ChatScreenState extends State<ChatScreen> {
   if (text.isNotEmpty) {
     _controller.clear();
     setState(() {
-      _messages.add("User: $text");
-      _messages.add("> $result");
+      _messages.add(text);
+      _messages.add(result);
     });
 
   
@@ -143,9 +143,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-class TextBox extends StatelessWidget 
-{
-
+class TextBox extends StatelessWidget {
   const TextBox({
     super.key,
     required List<String> messages,
@@ -160,12 +158,10 @@ class TextBox extends StatelessWidget
         padding: const EdgeInsets.all(8.0),
         child: Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255,21,21,20),
+            color: const Color.fromARGB(255, 21, 21, 20),
             border: Border.all(color: Colors.grey),
             borderRadius: BorderRadius.circular(12.0),
           ),
-    
-    
           child: _messages.isEmpty
               ? Center(
                   child: Text(
@@ -176,9 +172,14 @@ class TextBox extends StatelessWidget
               : ListView.builder(
                   itemCount: _messages.length,
                   itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.only(left: 32, top: 16),
-                      child: (index % 2 == 0)  ?  SelectableText("> ${_messages[index]}" , style: DefaultTextStyle.of(context).style.copyWith(color: const Color.fromARGB(255, 99, 81, 159)) ) : SelectableText( _messages[index] ,),
+                    final isUserMessage = (index % 2 == 0);
+                    return Container(
+                      margin: const EdgeInsets.all(32),
+                      child: ChatBubble(
+                        title: isUserMessage ? 'User' : 'Response',
+                        message: _messages[index],
+                              
+                      ),
                     );
                   },
                 ),
@@ -302,6 +303,59 @@ class _UserInputFieldState extends State<UserInputField> {
           onPressed: () => widget.handleSubmitted(widget.controller.text, _isCardSelected, _isKeySelected, _isChildSelected, _selectedLanguage),
         ),
       ],
+    );
+  }
+}
+
+
+
+class ChatBubble extends StatelessWidget {
+  final String message;
+  final String title; // Added title field
+
+  const ChatBubble({
+    super.key,
+    required this.message,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
+      child: Align(
+        alignment: Alignment.centerLeft, // Right alignment for user
+        child: Container(
+          constraints: const BoxConstraints(
+            maxWidth: 1200, // Maximum width for the bubble
+          ),
+          padding: const EdgeInsets.all(12.0),
+          decoration: BoxDecoration(
+            color: (title == "User") ? const Color.fromARGB(255, 99, 81, 159) : const Color.fromARGB(255, 51, 51, 53),
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title, 
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4), 
+              const Divider(thickness: 1, color: Colors.black38), 
+              const SizedBox(height: 8), 
+              Text(
+                message, 
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium!
+                    .copyWith(color:  (title == "User") ? const Color.fromARGB(255, 255, 255, 255) : const Color.fromARGB(255, 255, 255, 255), height: 1.3, fontSize: 20),
+                softWrap: true,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

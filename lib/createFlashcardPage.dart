@@ -93,8 +93,9 @@ class _CreateFlashCardState extends State<CreateFlashCard> {
                                        
                                         const SizedBox(height: 40),
                                          ElevatedButton(
+                                    
                                           onPressed: () => createFlashcard(_topicController.text, _titleController.text, _textController.text),
-                                          style: ElevatedButton.styleFrom(minimumSize: const Size(180, 40)),
+                                          style: ElevatedButton.styleFrom(backgroundColor:  const Color.fromARGB(255, 99, 81, 159), minimumSize: const Size(180, 40)),
                                           child: Text('Submit',style: Theme.of(context).textTheme.bodyMedium,),
                                         ),
                     

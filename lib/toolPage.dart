@@ -64,7 +64,7 @@ class _toolPageState extends State<toolPage> {
                     
                     height: 128,
                     width: 128, //disgusting magic number
-                    decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/placeholder.png"), fit: BoxFit.fill))),
+                    decoration: const BoxDecoration(image: DecorationImage(image: AssetImage("assets/images/cardsumLogo.png"), fit: BoxFit.fill))),
             
             backgroundColor:  const Color.fromARGB(255, 23, 23, 31),
             

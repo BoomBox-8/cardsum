@@ -67,6 +67,8 @@ flutter:
     - assets/images/flashcardsMock.png
     - assets/images/placeholder.png
     - assets/images/betterFlashcardsTitleBorder.png
+    - assets/images/cardsumLogo.png
+  
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
